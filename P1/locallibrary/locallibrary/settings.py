@@ -75,12 +75,23 @@ WSGI_APPLICATION = 'locallibrary.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+import dj_database_url  # Importamos el paquete para gestionar la URL de la base de datos
+                        #Esto es necesario para convertir una URL en una configuración de base de datos de Django.
+
+# Configuración inicial de la base de datos (puede estar vacía)
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': {}
 }
+
+# Configuracion la base de datos desde la URL o usa la URL por defecto
+db_from_env = dj_database_url.config(
+    default='postgres://alumnodb:alumnodb@localhost:5432/psi',  # URL por defecto
+    conn_max_age=500  # Mantiene las conexiones abiertas durante 500 segundos
+)
+
+# Actualiza el diccionario DATABASES con la configuración obtenida
+DATABASES['default'].update(db_from_env)
+
 
 
 # Password validation

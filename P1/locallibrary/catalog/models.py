@@ -22,6 +22,7 @@ class Genre(models.Model):
         """Returns the url to access a particular genre instance."""
         return reverse('genre-detail', args=[str(self.id)])
 
+    
     class Meta:
         constraints = [
             UniqueConstraint(
@@ -30,6 +31,8 @@ class Genre(models.Model):
                 violation_error_message = "Genre already exists (case insensitive match)"
             ),
         ]
+
+
 
 
 class Language(models.Model):
@@ -79,6 +82,13 @@ class Book(models.Model):
     language = models.ForeignKey(
         'Language', on_delete=models.SET_NULL, null=True)
 
+
+    def display_genre(self):
+        """Create a string for the Genre. This is required to display genre in Admin."""
+        return ', '.join(genre.name for genre in self.genre.all()[:3])
+
+    display_genre.short_description = 'Genre'
+    
     def __str__(self):
         """String for representing the Model object."""
         return self.title
@@ -87,6 +97,7 @@ class Book(models.Model):
         """Returns the URL to access a detail record for this book."""
         return reverse('book-detail', args=[str(self.id)])
 
+    
 
 
 import uuid # Required for unique book instances
