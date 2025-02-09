@@ -53,13 +53,14 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'locallibrary.urls'
 
+#especifica la ubicación donde Django busca plantillas
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
+        'APP_DIRS': True,       #Más importante: le indica a Django que busque plantillas en un subdirectorio de cada aplicación en el proyecto
+        'OPTIONS': {            #También podemos especificar ubicaciones específicas para que Django busque directorios
+            'context_processors': [     
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',

@@ -51,3 +51,4 @@ from django.conf.urls.static import static
 # Indica a Django dónde encontrar los archivos estáticos (definidos en settings.py).
 # Solo funciona en el entorno de desarrollo.
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
