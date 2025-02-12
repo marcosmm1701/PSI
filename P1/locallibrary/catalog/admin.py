@@ -9,6 +9,7 @@ from .models import Author, Genre, Book, BookInstance, Language
 #Esto indica que cada autor mostrará una tabla con las instancias de libros (BookInstance) asociadas a él.
 class BooksInstanceInline(admin.TabularInline):
     model = BookInstance
+    extra = 0 #para que no se muestren instancias adicionales en blanco
     
 # Register the Admin classes for Book using the decorator
 @admin.register(Book)
@@ -42,8 +43,8 @@ class BooksInline(admin.TabularInline):
     
 # Define the admin class
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'date_of_birth', 'date_of_death')
-    
+    list_display = ('last_name', 'first_name', 'date_of_birth', 'date_of_death')
+                        
     #atributo q enumera solo los campos que se mostrarán en el formulario, en orden
     fields = ['first_name', 'last_name', ('date_of_birth', 'date_of_death')]
 

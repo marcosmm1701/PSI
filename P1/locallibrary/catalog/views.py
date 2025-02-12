@@ -39,6 +39,8 @@ def index(request):
 class BookListView(generic.ListView):
     model = Book
     paginate_by = 2
+    ordering = ['title']    # Ordenar por título para evitar problemas y advertencias con la paginación de la lista de libros
+
     
     
 class BookDetailView(generic.DetailView):

@@ -95,6 +95,9 @@ class Book(models.Model):
     def get_absolute_url(self):
         """Returns the URL to access a detail record for this book."""
         return reverse('book-detail', args=[str(self.id)])
+    
+    class Meta:
+        ordering = ['title']    # Ordenar por título para evitar problemas y advertencias con la paginación de la lista de libros
 
     
 
@@ -142,7 +145,7 @@ class Author(models.Model):
     date_of_death = models.DateField('Died', null=True, blank=True)
 
     class Meta:
-        ordering = ['last_name', 'first_name']
+        ordering = ['last_name']
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
