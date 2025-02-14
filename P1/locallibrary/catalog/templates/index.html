@@ -20,4 +20,9 @@
     <li><strong>Filtered Books:</strong> {{ books_filtered }}</li>
     <li><strong>Filtered Genres:</strong> {{ genres_filtered }}</li>
   </ul>
+
+  <p>
+    You have visited this page {{ num_visits }} time{{ num_visits|pluralize }}.
+  </p>
+  
 {% endblock %}
