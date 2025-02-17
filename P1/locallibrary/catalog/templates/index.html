@@ -10,16 +10,19 @@
     Welcome to LocalLibrary, a website developed by
     <em>Mozilla Developer Network</em>!
   </p>
-  <h2>Dynamic content</h2>
-  <p>The library has the following record counts:</p>
-  <ul>
-    <li><strong>Books:</strong> {{ num_books }}</li>
-    <li><strong>Copies:</strong> {{ num_instances }}</li>
-    <li><strong>Books containing the letter 'a' in the title::</strong> {{ num_instances_available }}</li>
-    <li><strong>Authors:</strong> {{ num_authors }}</li>
-    <li><strong>Filtered Books:</strong> {{ books_filtered }}</li>
-    <li><strong>Filtered Genres:</strong> {{ genres_filtered }}</li>
-  </ul>
+  <div class="dynamic-content">
+    <h2>Dynamic content</h2>
+    <p>The library has the following record counts:</p>
+    <ul>
+      <!-- como con strong no se deja espacio, hemos añadido &nbsp; para obligar a que lo haya-->
+        <li><strong>Books: </strong>&nbsp;{{ num_books }}</li>
+        <li><strong>Copies: </strong>&nbsp;{{ num_instances }}</li>
+        <li><strong>Copies available:</strong>&nbsp;{{ books_filtered }}</li>
+        <li><strong>Authors: </strong>&nbsp;{{ num_authors }}</li>
+        <li><strong>Genres: </strong>&nbsp;{{ genres_filtered }}</li>
+        <li><strong>Books containing the letter 'a' in the title: </strong>&nbsp;{{ num_instances_available }}</li>
+    </ul>
+  </div>
 
   <p>
     You have visited this page {{ num_visits }} time{{ num_visits|pluralize }}.

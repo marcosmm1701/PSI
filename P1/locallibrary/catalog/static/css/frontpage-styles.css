@@ -1,0 +1,72 @@
+/* Estilos específicos para la lista numerada en la página principal */
+.dynamic-content ul {
+    list-style: none;
+    padding: 0;
+    counter-reset: list-counter;
+  }
+  
+  .dynamic-content ul li {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  
+  .dynamic-content ul li::before {
+    content: counter(list-counter);
+    counter-increment: list-counter;
+    background-color: #f1c40f;
+    color: blue;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  
+  
+  
+  /* Estilos para los botones Login y Logout */
+  .button-container {
+    margin-top: 20px;
+  }
+  
+  .button-login, .button-logout {
+    display: block;
+    width: 100px;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+  }
+  
+  .button-login {
+    background-color: #3498db;
+    color: white;
+  }
+  
+  .button-login:hover {
+    background-color: #2980b9;
+  }
+  
+  .button-logout {
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  .button-logout:hover {
+    background-color: #c0392b;
+  }
+  
+  /* Estilo para el pie de página */
+  footer {
+    text-align: center;  /* Centra el texto */
+    padding: 10px;  /* Espaciado */
+    position: fixed;  /* Fijado en la parte inferior */
+    bottom: 0;  /* Asegura que está en la parte inferior */
+    width: 100%;  /* Ocupar todo el ancho */
+    background-color: #f8f9fa;  /* Color de fondo sutil */
+    border-top: 1px solid #ccc;  /* Línea superior */
+  }
+  
+  

@@ -10,8 +10,8 @@
 
   <p><strong>Summary:</strong> {{ book.summary }}</p>
   <p><strong>ISBN:</strong> {{ book.isbn }}</p>
-  <p><strong>Language:</strong> {{ book.language }}</p>
-  <p><strong>Genre:</strong> {{ book.genre.all|join:", " }}</p>
+  <p><strong>Language:</strong> <a href="{{book.language.get_absolute_url}}">{{ book.language }}</a></p>
+  <p><strong>Genre:</strong> <a href="{{book.genre.get_absolute_url}}">{{ book.genre.all|join:", " }}</a></p>
 
   <div style="margin-left:20px;margin-top:20px">
     <h4>Copies</h4>
@@ -31,3 +31,20 @@
     {% endfor %}
   </div>
 {% endblock %}
+
+{% block sidebar %}
+  {{ block.super }}
+
+  {% if perms.catalog.change_book or perms.catalog.delete_book %}
+    <hr>
+    <ul class="sidebar-nav">
+      {% if perms.catalog.change_book %}
+        <li><a href="{% url 'book-update' book.id %}">Update book</a></li>
+      {% endif %}
+      <!-- Comprueba que el autor no tenga libros para mostrar el boton de delete-->
+      {% if not book.bookinstance_set.all and perms.catalog.delete_book %}
+        <li><a href="{% url 'book-delete' book.id %}">Delete author</a></li>
+      {% endif %}
+    </ul>
+  {% endif %}
+  {% endblock %}

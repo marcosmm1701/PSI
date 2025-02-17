@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Renew: {{ book_instance.book.title }}</h1>
+  <p>Borrower: {{ book_instance.borrower }}</p>
+  <p {% if book_instance.is_overdue %} class="text-danger"{% endif %} >Due date: {{ book_instance.due_back }}</p>
+
+<!-- Cuando action = "" => significa que los datos del formulario se enviarán nuevamente a la URL actual de la página -->
+  <form action="" method="post">
+    {% csrf_token %}    <!--protección contra falsificaciones (se utiliza siempre con post)-->
+    <table>
+    {{ form.as_table }}
+    </table>
+    <input type="submit" value="Submit">
+  </form>
+{% endblock %}

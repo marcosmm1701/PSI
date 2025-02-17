@@ -1,0 +1,15 @@
+<!-- catalog/templates/catalog/language_detail.html -->
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>{{ language.name }}</h1>
+
+  <h2>Libros en este idioma</h2>
+  <ul>
+    {% for book in language.book_set.all %}
+      <li><a href="{{ book.get_absolute_url }}">{{ book.title }}</a></li>
+    {% empty %}
+      <li>No hay libros en este idioma.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
