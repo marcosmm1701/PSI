@@ -126,7 +126,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Europe/London'
+TIME_ZONE = 'Europe/Madrid'
 
 USE_I18N = True
 
@@ -139,14 +139,7 @@ USE_TZ = True
 # Configuración de archivos estáticos
 STATIC_URL = '/static/'  # URL base donde se accederán los archivos estáticos
 
-# Nos aseguramos de que Django también busque archivos estáticos en la carpeta `static` del proyecto
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Carpeta estática global
-]
-
-# Cuando estemos en producción, Django usará esta carpeta para almacenar los archivos estáticos procesados
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Directorio donde se recopilarán los archivos estáticos
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Directorio donde se recopilarán los archivos estáticos
 
 
 # Default primary key field type
@@ -165,3 +158,13 @@ LOGOUT_REDIRECT_URL = '/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
+
+
+STORAGES = {
+    #...
+    "staticfiles": {
+        "BACKEND": "withenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+    
