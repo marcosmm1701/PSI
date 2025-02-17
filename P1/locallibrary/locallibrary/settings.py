@@ -79,30 +79,30 @@ WSGI_APPLICATION = 'locallibrary.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-import dj_database_url  # Importamos el paquete para gestionar la URL de la base de datos
-                        #Esto es necesario para convertir una URL en una configuración de base de datos de Django.
-
-# Configuración inicial de la base de datos (puede estar vacía)
-DATABASES = {
-    'default': {}
-}
-
 import os
 import dj_database_url
 
-# Si 'TESTING' está en las variables de entorno, se usa la base de datos local
+# Configuración de la base de datos
 if 'TESTING' in os.environ:
-    db_from_env = dj_database_url.config(
-        default='postgres://alumnodb:alumnodb@localhost:5432/psi',  # Base de datos local para testing
-        conn_max_age=500
-    )
+    # Configuración para pruebas locales
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'psi',
+            'USER': 'alumnodb',
+            'PASSWORD': 'alumnodb',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 else:
-    db_from_env = dj_database_url.config(
-        default=os.getenv('postgresql://neondb_owner:npg_lF7B2exmGshD@ep-sparkling-river-a964t5ki-pooler.gwc.azure.neon.tech/neondb?sslmode=require'),  # URL de la base de datos en Neon para producción
-        conn_max_age=500
-    )
-
-DATABASES['default'].update(db_from_env)
+    # Configuración para producción (usando Neon.tech)
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL', 'postgresql://neondb_owner:npg_lF7B2exmGshD@ep-sparkling-river-a964t5ki-pooler.gwc.azure.neon.tech/neondb?sslmode=require'),
+            conn_max_age=500
+        )
+    }
 
 
 
