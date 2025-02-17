@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-38kdef3zlgo)t9uy!c(=#-^u06o%fxh53!-rcrxe#^qk!y+*v+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -86,13 +86,21 @@ DATABASES = {
     'default': {}
 }
 
-# Configuracion la base de datos desde la URL o usa la URL por defecto
-db_from_env = dj_database_url.config(
-    default='postgres://alumnodb:alumnodb@localhost:5432/psi',  # URL por defecto
-    conn_max_age=500  # Mantiene las conexiones abiertas durante 500 segundos
-)
+import os
+import dj_database_url
 
-# Actualiza el diccionario DATABASES con la configuración obtenida
+# Si 'TESTING' está en las variables de entorno, se usa la base de datos local
+if 'TESTING' in os.environ:
+    db_from_env = dj_database_url.config(
+        default='postgres://alumnodb:alumnodb@localhost:5432/psi',  # Base de datos local para testing
+        conn_max_age=500
+    )
+else:
+    db_from_env = dj_database_url.config(
+        default=os.getenv('postgresql://neondb_owner:npg_lF7B2exmGshD@ep-sparkling-river-a964t5ki-pooler.gwc.azure.neon.tech/neondb?sslmode=require'),  # URL de la base de datos en Neon para producción
+        conn_max_age=500
+    )
+
 DATABASES['default'].update(db_from_env)
 
 
@@ -131,7 +139,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# Configuración de archivos estáticos
+STATIC_URL = '/static/'  # URL base donde se accederán los archivos estáticos
+
+# Nos aseguramos de que Django también busque archivos estáticos en la carpeta `static` del proyecto
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Carpeta estática global
+]
+
+# Cuando estemos en producción, Django usará esta carpeta para almacenar los archivos estáticos procesados
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Directorio donde se recopilarán los archivos estáticos
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
