@@ -84,6 +84,12 @@ WSGI_APPLICATION = 'locallibrary.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),  # Usa DATABASE_URL como variable de entorno
+        conn_max_age=600
+    )
+}
 
 if 'TESTING' in os.environ:
     db_from_env = dj_database_url.config(default=os.getenv("POSTGRESQL_URL"),
