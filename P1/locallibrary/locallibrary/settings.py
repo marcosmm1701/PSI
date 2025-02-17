@@ -65,7 +65,7 @@ ROOT_URLCONF = 'locallibrary.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')], #Especifica la ubicación donde Django busca plantillas
+        'DIRS': [BASE_DIR / 'templates'], #Especifica la ubicación donde Django busca plantillas
         'APP_DIRS': True,       #Más importante: le indica a Django que busque plantillas en un subdirectorio de cada aplicación en el proyecto
         'OPTIONS': {            #También podemos especificar ubicaciones específicas para que Django busque directorios
             'context_processors': [     
@@ -158,9 +158,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 STORAGES = {
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+
 
 
     
