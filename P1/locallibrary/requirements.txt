@@ -5,3 +5,15 @@ Django==4.2.18
 psycopg2==2.9.7
 sqlparse==0.5.3
 typing_extensions==4.12.2
+Brotli==1.0.9
+flake8==6.1.0
+gunicorn==21.2.0
+mccabe==0.7.0
+packaging==23.2
+Pillow==9.4.0
+pycodestyle==2.11.1
+pyflakes==3.1.0
+python-dotenv==1.0.0
+sqlparse==0.4.4
+typing_extensions==4.9.0
+whitenoise==5.2.0
