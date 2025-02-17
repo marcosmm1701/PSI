@@ -87,18 +87,16 @@ WSGI_APPLICATION = 'locallibrary.wsgi.application'
 
 if 'TESTING' in os.environ:
     db_from_env = dj_database_url.config(default=os.getenv("POSTGRESQL_URL"),
-conn_max_age=500)
+    conn_max_age=500)
 else:
     db_from_env = dj_database_url.config(default=os.getenv("NEON_URL"),
-conn_max_age=500, ssl_require=True)
+    conn_max_age=500, ssl_require=True)
 
 
 
 DATABASES = {
     'default': db_from_env
 }
-
-DATABASES['default'].update(db_from_env)
 
 
 
@@ -158,13 +156,11 @@ LOGOUT_REDIRECT_URL = '/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
-
-
 STORAGES = {
-    #...
     "staticfiles": {
-        "BACKEND": "withenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
 
     
