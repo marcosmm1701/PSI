@@ -1,3 +1,0 @@
-Cada vez q cambiamos models.py:
-    python3 manage.py makemigrations
-    python3 manage.py migrate

@@ -1,0 +1,21 @@
+***************************************
+*                                     *
+*              EQUIPO 8               *
+*                                     *
+***************************************
+
+Autores:
+
+1. Ignacio Serena Montiel
+2. Marcos Muñoz Merchán
+
+
+#######################################################################################################
+Aclaraciones:                                                                                         #
+- Los test necesarios para completar el 100% de coverage han sido distribuidos                        #
+  en sus archivos correspondientes, no en un fichero test additional.py                               #
+                                                                                                      #
+- Ahora la configuración se está definida para un servicio local (PostgreSQL),                        #
+  recuerde que si quiere lanzar la aplicación en render, debe cambiar las variables DEBUG y TESTING   #
+  de el alchivo .env a False.                                                                         #
+#######################################################################################################
