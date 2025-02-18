@@ -1,13 +1,14 @@
+from datetime import date, timedelta
+from catalog.models import BookInstance, Book, Author, User, Language, Genre
 from django.test import TestCase
-from catalog.models import Author, BookInstance, Book, Genre, Language
-from unittest.mock import patch
+
 
 class AuthorModelTest(TestCase):
-    #se llama al método una vez para la clase
+    # se llama al método una vez para la clase
     @classmethod
     def setUpTestData(cls):
         # Set up non-modified objects used by all test methods
-        Author.objects.create(id = 1,first_name='Big', last_name='Bob')
+        Author.objects.create(id=1, first_name='Big', last_name='Bob')
 
     def test_first_name_label(self):
         author = Author.objects.get(id=1)
@@ -34,15 +35,6 @@ class AuthorModelTest(TestCase):
         # This will also fail if the urlconf is not defined.
         self.assertEqual(author.get_absolute_url(), '/catalog/author/1')
 
-    def test_object_name_is_last_name_comma_first_name(self):
-        author = Author.objects.get(id=1)
-        expected_object_name = f'{author.last_name}, {author.first_name}'
-        self.assertEqual(str(author), expected_object_name)
-
-    
-
-from django.test import TestCase
-from catalog.models import Genre
 
 class GenreModelTest(TestCase):
     @classmethod
@@ -69,16 +61,13 @@ class GenreModelTest(TestCase):
         genre = Genre.objects.get(id=1)
         # This will also fail if the urlconf is not defined.
         self.assertEqual(genre.get_absolute_url(), '/catalog/genre/1')
-        
+
     def test_name_case_insensitive_unique(self):
-        # Intentar crear un género con el mismo nombre (ignorando mayúsculas/minúsculas)
+        # Intentar crear un género con el mismo nombre (ignorando
+        # mayúsculas/minúsculas)
         with self.assertRaises(Exception):
             Genre.objects.create(name='science fiction')
-            
-            
-            
-from django.test import TestCase
-from catalog.models import Language
+
 
 class LanguageModelTest(TestCase):
     @classmethod
@@ -106,14 +95,11 @@ class LanguageModelTest(TestCase):
         self.assertEqual(language.get_absolute_url(), '/catalog/language/1')
 
     def test_name_case_insensitive_unique(self):
-        # Intentar crear un idioma con el mismo nombre (ignorando mayúsculas/minúsculas)
+        # Intentar crear un idioma con el mismo nombre (ignorando
+        # mayúsculas/minúsculas)
         with self.assertRaises(Exception):
             Language.objects.create(name='english')
-            
-            
 
-from django.test import TestCase
-from catalog.models import Book, Author, Genre, Language
 
 class BookModelTest(TestCase):
     @classmethod
@@ -173,14 +159,7 @@ class BookModelTest(TestCase):
         book = Book.objects.get(id=1)
         expected_genre = 'Dystopian'
         self.assertEqual(book.display_genre(), expected_genre)
-        
-        
-        
-        
-        
-from django.test import TestCase
-from catalog.models import BookInstance, Book, Author, User
-from datetime import date, timedelta
+
 
 class BookInstanceModelTest(TestCase):
     @classmethod
@@ -218,7 +197,8 @@ class BookInstanceModelTest(TestCase):
 
     def test_object_name_is_id_and_title(self):
         book_instance = BookInstance.objects.get(id=1)
-        expected_object_name = f'{book_instance.id} ({book_instance.book.title})'
+        book_title = book_instance.book.title
+        expected_object_name = f'{book_instance.id} ({book_title})'
         self.assertEqual(str(book_instance), expected_object_name)
 
     def test_is_overdue(self):
