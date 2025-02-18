@@ -19,8 +19,8 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env_path = load_dotenv(os.path.join(BASE_DIR, '.env'))
-load_dotenv(env_path)
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -31,6 +31,7 @@ SECRET_KEY = 'django-insecure-38kdef3zlgo)t9uy!c(=#-^u06o%fxh53!-rcrxe#^qk!y+*v+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+                #psi-ruhh.onrender.com,localhost,127.0.0.1
 ALLOWED_HOSTS = ['*']
 
 
@@ -85,25 +86,33 @@ WSGI_APPLICATION = 'locallibrary.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),  # Usa DATABASE_URL como variable de entorno
+#IMPORTANTE: Configure TESTING en el archivo .env para usar la base de datos local o la de neon (NUBE)
+print("TESTING:", os.getenv("TESTING"))
+
+if os.getenv("TESTING") == 'True':
+    print("USANDO BASE DE DATOS LOCAL")
+    db_from_env = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'psi',
+        'USER': 'alumnodb',
+        'PASSWORD': 'alumnodb',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+else:
+    print("USANDO BASE DE DATOS NEON")
+    db_from_env = dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
         conn_max_age=600
     )
-}
-
-if 'TESTING' in os.environ:
-    db_from_env = dj_database_url.config(default=os.getenv("POSTGRESQL_URL"),
-    conn_max_age=500)
-else:
-    db_from_env = dj_database_url.config(default=os.getenv("NEON_URL"),
-    conn_max_age=500, ssl_require=True)
-
 
 
 DATABASES = {
     'default': db_from_env
 }
+
+print(f"Using database: {DATABASES['default']['NAME']}")
+
 
 
 
