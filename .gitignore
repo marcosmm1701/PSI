@@ -8,3 +8,5 @@
 *.pyo
 *.pyd
 __pycache__/
+
+/P1
