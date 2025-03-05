@@ -8,9 +8,14 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <formulario-persona /> <!-- Inclusion del componente "FormularioPersona" -->
+        <!-- Formulario para agregar nuevas personas -->
+        <formulario-persona @add-persona="agregarPersona" /> <!-- Inclusion del componente "FormularioPersona" -->
+        
         <!-- Inclusion del componente "TablaPersonas" -->
         <tabla-personas :personas="personas" /> <!-- Para pasar los datos a TablaPersonas.vue -->
+
+        
+        
       </div>
     </div>
   </div>
@@ -54,6 +59,23 @@ const personas = ref([
     email: 'daenerys@email.com',
   },
 ]);
+
+
+
+const agregarPersona = (persona) => {
+
+  let id = 0;
+
+  if (personas.value.length > 0) {
+  id = personas.value[personas.value.length - 1].id + 1;
+  }
+  // operador de propagacion
+  // actualizamos el valor del array creando un nuevo array con los valores existentes 
+  // y agregando la nueva persona
+  personas.value = [...personas.value, { ...persona, id }];
+};
+
+
 
 
 </script>
