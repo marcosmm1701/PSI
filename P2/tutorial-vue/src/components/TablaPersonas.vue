@@ -119,11 +119,13 @@ defineOptions({
 
 // declaramos y damos valor por defecto para la propiedad personas
 // lo eliminamos por el lint
-/*
-const props = defineProps({
-  personas: { type: Array, default: [] },
+
+const { personas } = defineProps({
+  personas: {
+    type: Array,
+    default: () => [],
+  },
 });
-*/
 
 const editando = ref(null); // ID de la persona que está siendo editada
 const personaEditada = ref(null); // Copia de los datos originales de la persona
