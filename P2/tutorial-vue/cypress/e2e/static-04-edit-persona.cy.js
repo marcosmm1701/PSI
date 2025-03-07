@@ -17,15 +17,8 @@ context("Edit persona", () => {
       cy.get("[data-cy=add-button]").click();
       cy.get("div.alert-success");
 
-      //cy.wait(1000);
+      cy.wait(1000);
 
-      // Cambiamos el modo de espera para eliminar los errores del lint
-
-      // Espera a que la alerta de éxito esté visible
-      cy.get("div.alert-success").should("be.visible");
-
-      // Espera a que la tabla tenga al menos una fila
-      cy.get("table").find("tr").should("have.length.gt", 0);
 
       cy.get("table")
         .find("tr")
@@ -51,14 +44,8 @@ context("Edit persona", () => {
       cy.get("[data-cy=add-button]").click();
       cy.get("div.alert-success");
 
-      //cy.wait(1000);
+      cy.wait(1000);
 
-      // Cambiamos el modo de espera para eliminar los errores del lint
-      // Espera a que la alerta de éxito esté visible
-      cy.get("div.alert-success").should("be.visible");
-
-      // Espera a que la tabla tenga al menos una fila
-      cy.get("table").find("tr").should("have.length.gt", 0);
 
       cy.get("table")
         .find("tr")
