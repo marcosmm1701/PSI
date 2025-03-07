@@ -111,7 +111,7 @@
 <script setup>
 import { ref } from "vue";
 
-// definicion del componente
+// definicion del componentes
 defineOptions({
   // nombre del componente
   name: "TablaPersonas",
