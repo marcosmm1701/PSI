@@ -45,10 +45,14 @@ defineOptions({
 const personas = ref([]);
 const store = useCounterStore();
 
+// Obtenemos la URL del backend desde las variables de entorno
+const API_URL = import.meta.env.VITE_DJANGOURL;
+console.log("API_URL:", API_URL);
+
 const listadoPersonas = async () => {
   // Metodo para obtener un listado de personas
   try {
-    const response = await fetch("http://localhost:8001/api/v1/personas/");
+    const response = await fetch(API_URL);
     personas.value = await response.json();
   } catch (error) {
     console.error(error);
@@ -64,7 +68,7 @@ const agregarPersona = async (persona, callback) => {
       return;
     }
 
-    const response = await fetch("http://localhost:8001/api/v1/personas/", {
+    const response = await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify(persona),
       headers: { "Content-type": "application/json; charset=UTF-8" },
@@ -97,7 +101,7 @@ const eliminarPersona = async (persona_id) => {
 
   // Metodo para eliminar una persona
   try {
-    await fetch("http://localhost:8001/api/v1/personas/" + persona_id + "/", {
+    await fetch(API_URL + persona_id + "/", {
       method: "DELETE",
     });
     personas.value = personas.value.filter((u) => u.id !== persona_id);
@@ -115,7 +119,7 @@ const actualizarPersona = async (id, personaActualizada) => {
 
   try {
     const response = await fetch(
-      "http://localhost:8001/api/v1/personas/" + personaActualizada.id + "/",
+      API_URL + personaActualizada.id + "/",
       {
         method: "PUT",
         body: JSON.stringify(personaActualizada),

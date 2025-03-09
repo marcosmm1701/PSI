@@ -63,6 +63,7 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:5173',
+    'http://localhost:4173',
     'https://psi-1-ir6w.onrender.com',
 ]
 
