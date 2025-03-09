@@ -13,15 +13,22 @@
         <!-- Inclusion del componente "FormularioPersona" -->
 
         <!-- Inclusion del componente "TablaPersonas" -->
-        <tabla-personas :personas="personas" @delete-persona="eliminarPersona"
-          @actualizar-persona="actualizarPersona" />
+        <tabla-personas
+          :personas="personas"
+          @delete-persona="eliminarPersona"
+          @actualizar-persona="actualizarPersona"
+        />
       </div>
     </div>
+  </div>
+  <div>
+    <p>Count is {{ store.count }}</p>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from "vue";
+import { useCounterStore } from "@/stores/counter";
 
 // Importacion del componente "FormularioPersona"
 import FormularioPersona from "@/components/FormularioPersona.vue";
@@ -36,39 +43,60 @@ defineOptions({
 
 // Declaracion de una variable reactiva "personas" usando "ref"
 const personas = ref([]);
+const store = useCounterStore();
 
 const listadoPersonas = async () => {
   // Metodo para obtener un listado de personas
   try {
-    const response = await fetch('https://my-json-server.typicode.com/rmarabini/people/personas/');
+    const response = await fetch("http://localhost:8001/api/v1/personas/");
     personas.value = await response.json();
   } catch (error) {
     console.error(error);
   }
-
 };
 
 const agregarPersona = async (persona) => {
   try {
-    const response = await fetch('https://my-json-server.typicode.com/rmarabini/people/personas/', {
-      method: 'POST',
+    // Validamos que el email tiene un formato correcto antes de hacer la petición
+    if (!persona.email.includes("@") || !persona.email.includes(".")) {
+      alert("Por favor, introduce un email válido.");
+      return;
+    }
+
+    const response = await fetch("http://localhost:8001/api/v1/personas/", {
+      method: "POST",
       body: JSON.stringify(persona),
-      headers: { 'Content-type': 'application/json; charset=UTF-8' },
+      headers: { "Content-type": "application/json; charset=UTF-8" },
     });
+
     const personaCreada = await response.json();
+
+    if (!response.ok) {
+      console.error("Error al agregar persona:", personaCreada);
+      alert(personaCreada.email ? personaCreada.email[0] : "Error desconocido");
+      return;
+    }
+
     personas.value = [...personas.value, personaCreada];
+    store.increment();
+    return true; // Indica que la persona se agregó correctamente
   } catch (error) {
     console.error(error);
   }
 };
 
 const eliminarPersona = async (persona_id) => {
+  if (!persona_id) {
+    console.error("Error: persona_id es undefined");
+    return;
+  }
+
   // Metodo para eliminar una persona
   try {
-    await fetch('https://my-json-server.typicode.com/rmarabini/people/personas/' + persona_id + '/', {
-      method: "DELETE"
+    await fetch("http://localhost:8001/api/v1/personas/" + persona_id + "/", {
+      method: "DELETE",
     });
-    personas.value = personas.value.filter(u => u.id !== persona_id);
+    personas.value = personas.value.filter((u) => u.id !== persona_id);
   } catch (error) {
     console.error(error);
   }
@@ -76,26 +104,33 @@ const eliminarPersona = async (persona_id) => {
 
 const actualizarPersona = async (id, personaActualizada) => {
   // Metodo para actualizar una persona
+  if (!id) {
+    console.error("Error: id es undefined");
+    return;
+  }
+
   try {
-    const response = await fetch('https://my-json-server.typicodecom/rmarabini/people/personas/' + personaActualizada.id + '/'
-      , {
-        method: 'PUT',
+    const response = await fetch(
+      "http://localhost:8001/api/v1/personas/" + personaActualizada.id + "/",
+      {
+        method: "PUT",
         body: JSON.stringify(personaActualizada),
-        headers: { 'Content-type': 'application/json; charset=UTF-8' },
-      });
+        headers: { "Content-type": "application/json; charset=UTF-8" },
+      }
+    );
     const personaActualizadaJS = await response.json();
-    personas.value = personas.value.map(u => (u.id === personaActualizada.id ? personaActualizadaJS : u));
+    personas.value = personas.value.map((u) =>
+      u.id === personaActualizada.id ? personaActualizadaJS : u
+    );
   } catch (error) {
     console.error(error);
   }
 };
 
-
 // Fetch data when the component is mounted
 onMounted(() => {
   listadoPersonas();
 });
-
 </script>
 
 <style>

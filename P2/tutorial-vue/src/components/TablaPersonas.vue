@@ -84,7 +84,6 @@
 
             <td v-else>
               <div class="acciones">
-                
                 <button
                   class="btn btn-info"
                   data-cy="edit-button"

@@ -19,7 +19,6 @@ context("Edit persona", () => {
 
       cy.wait(1000);
 
-
       cy.get("table")
         .find("tr")
         .its("length")
@@ -45,7 +44,6 @@ context("Edit persona", () => {
       cy.get("div.alert-success");
 
       cy.wait(1000);
-
 
       cy.get("table")
         .find("tr")

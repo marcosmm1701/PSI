@@ -13,7 +13,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "pinia": "^2.0.26",
+    "pinia": "^2.3.1",
     "vue": "^3.2.45"
   },
   "devDependencies": {

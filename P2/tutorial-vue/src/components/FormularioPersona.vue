@@ -127,21 +127,28 @@ const enviarFormulario = () => {
     return;
   }
 
-  // Emitir evento "add-persona" con el valor de la variable "persona"
-  emit("add-persona", persona.value);
+  // Emitimos el evento y esperamos respuesta de App.vue
+  emit("add-persona", persona.value, (errorMessage) => {
+    if (errorMessage) {
+      error.value = true;
+      alert(errorMessage); // Mostrar el error recibido
+    } else {
+      correcto.value = true;
+    }
+  });
 
   // Enfocar el campo de nombre. Es decir, el cursor, al recargar la pagina se enfocara en el campo de nombre
   nombre.value.focus();
 
-  // Limpiamos el formulario
-  persona.value = {
-    nombre: "",
-    apellido: "",
-    email: "",
-  };
+  if (!error.value) {
+    // Limpiamos el formulario
+    persona.value = {
+      nombre: "",
+      apellido: "",
+      email: "",
+    };
+  }
 
-  error.value = false;
-  correcto.value = true;
   procesando.value = false;
 };
 

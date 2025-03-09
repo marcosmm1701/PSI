@@ -15,6 +15,7 @@ context("Add persona", () => {
       cy.get("[data-cy=surname]").type("Land");
       cy.get("[data-cy=email]").type("paco@land.com");
       cy.get("[data-cy=add-button]").click();
+      cy.wait(1000)
       cy.get("div.alert-success");
     });
 
@@ -22,6 +23,7 @@ context("Add persona", () => {
       cy.get("[data-cy=name]").type("Paco");
       cy.get("[data-cy=surname]").type("Land");
       cy.get("[data-cy=add-button]").click();
+      cy.wait(1000)
       cy.get("div.alert-danger");
     });
 
@@ -29,17 +31,20 @@ context("Add persona", () => {
       cy.get("[data-cy=name]").type("Paco");
       cy.get("[data-cy=email]").type("paco@land.com");
       cy.get("[data-cy=add-button]").click();
+      cy.wait(1000)
       cy.get("div.alert-danger");
     });
 
     it("Add persona KO 3", () => {
       cy.get("[data-cy=email]").type("paco@land.com");
       cy.get("[data-cy=add-button]").click();
+      cy.wait(1000)
       cy.get("div.alert-danger");
     });
 
     it("Add persona KO 4", () => {
       cy.get("[data-cy=add-button]").click();
+      cy.wait(1000)
       cy.get("div.alert-danger");
     });
 
@@ -48,6 +53,7 @@ context("Add persona", () => {
       cy.get("[data-cy=surname]").type("Land");
       cy.get("[data-cy=email]").type("paco land.com");
       cy.get("[data-cy=add-button]").click();
+      cy.wait(1000)
       cy.get("div.alert-danger").should("not.exist");
       cy.get("div.alert-success").should("not.exist");
     });
@@ -57,6 +63,7 @@ context("Add persona", () => {
       cy.get("[data-cy=surname]").type("Land");
       cy.get("[data-cy=email]").type("@land");
       cy.get("[data-cy=add-button]").click();
+      cy.wait(1000)
       cy.get("div.alert-danger").should("not.exist");
       cy.get("div.alert-success").should("not.exist");
     });

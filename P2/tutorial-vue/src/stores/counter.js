@@ -1,12 +1,32 @@
-import { ref, computed } from "vue";
+// Archivo creado para contar el numero de personas almacenadas.
+
 import { defineStore } from "pinia";
 
-export const useCounterStore = defineStore("counter", () => {
-  const count = ref(0);
-  const doubleCount = computed(() => count.value * 2);
-  function increment() {
-    count.value++;
-  }
+const COUNTER_LOCAL_STORAGE_KEY = "localCounter";
 
-  return { count, doubleCount, increment };
+const getCount = () => {
+  const storedCounter = localStorage.getItem(COUNTER_LOCAL_STORAGE_KEY);
+  return storedCounter ? JSON.parse(storedCounter) : 0;
+};
+export const useCounterStore = defineStore("counter", {
+  state: () => ({
+    count: getCount(),
+  }),
+  getters: {
+    singleCount(state) {
+      return state.count;
+    },
+  },
+  actions: {
+    increment() {
+      this.count++;
+      localStorage.setItem(
+        COUNTER_LOCAL_STORAGE_KEY,
+        JSON.stringify(this.count)
+      );
+    },
+  },
 });
+if (localStorage.getItem("state")) {
+  pinia.state.value = JSON.parse(localStorage.getItem("state"));
+}
