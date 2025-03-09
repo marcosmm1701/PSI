@@ -19,44 +19,24 @@
               <!-- :class:  condicional que se aplica si 'procesando' es verdadero y 'nombreInvalido' es verdadero -->
               <!-- @focus: Manejador de evento cuando el input obtiene el foco -->
               <!-- @keypress: Manejador de evento cuando se presiona una tecla en el input -->
-              <input
-                ref="nombre"
-                v-model="persona.nombre"
-                type="text"
-                class="form-control"
-                data-cy="name"
-                :class="{ 'is-invalid': procesando && nombreInvalido }"
-                @focus="resetEstado"
-                @keypress="resetEstado"
-              />
+              <input ref="nombre" v-model="persona.nombre" type="text" class="form-control" data-cy="name"
+                :class="{ 'is-invalid': procesando && nombreInvalido }" @focus="resetEstado" @keypress="resetEstado" />
             </div>
           </div>
           <div class="col-md-4">
             <div class="form-group">
               <!-- Etiqueta y campo de entrada para el apellido -->
               <label>Apellido</label>
-              <input
-                v-model="persona.apellido"
-                type="text"
-                class="form-control"
-                data-cy="surname"
-                :class="{ 'is-invalid': procesando && apellidoInvalido }"
-                @focus="resetEstado"
-              />
+              <input v-model="persona.apellido" type="text" class="form-control" data-cy="surname"
+                :class="{ 'is-invalid': procesando && apellidoInvalido }" @focus="resetEstado" />
             </div>
           </div>
           <div class="col-md-4">
             <div class="form-group">
               <!-- Etiqueta y campo de entrada para el correo electronico -->
               <label>Email</label>
-              <input
-                v-model="persona.email"
-                type="email"
-                class="form-control"
-                data-cy="email"
-                :class="{ 'is-invalid': procesando && emailInvalido }"
-                @focus="resetEstado"
-              />
+              <input v-model="persona.email" type="email" class="form-control" data-cy="email"
+                :class="{ 'is-invalid': procesando && emailInvalido }" @focus="resetEstado" />
             </div>
           </div>
         </div>
@@ -77,11 +57,7 @@
       <div class="container">
         <div class="row">
           <div class="col-md-12">
-            <div
-              v-if="error && procesando"
-              class="alert alert-danger"
-              role="alert"
-            >
+            <div v-if="error && procesando" class="alert alert-danger" role="alert">
               Debes rellenar todos los campos!
             </div>
             <div v-if="correcto" class="alert alert-success" role="alert">
@@ -127,28 +103,28 @@ const enviarFormulario = () => {
     return;
   }
 
-  // Emitimos el evento y esperamos respuesta de App.vue
-  emit("add-persona", persona.value, (errorMessage) => {
-    if (errorMessage) {
-      error.value = true;
-      alert(errorMessage); // Mostrar el error recibido
-    } else {
-      correcto.value = true;
+
+  // Emitimos el evento y pasamos un callback para manejar el resultado
+  emit("add-persona", persona.value, (success) => {
+    if (!success) {
+      error.value = true; // Mostrar mensaje de error
+      return;
     }
   });
+
 
   // Enfocar el campo de nombre. Es decir, el cursor, al recargar la pagina se enfocara en el campo de nombre
   nombre.value.focus();
 
-  if (!error.value) {
-    // Limpiamos el formulario
-    persona.value = {
-      nombre: "",
-      apellido: "",
-      email: "",
-    };
-  }
+  // Limpiamos el formulario
+  persona.value = {
+    nombre: "",
+    apellido: "",
+    email: "",
+  };
 
+  correcto.value = true;
+  error.value = false;
   procesando.value = false;
 };
 

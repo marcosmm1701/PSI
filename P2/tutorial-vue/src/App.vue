@@ -55,11 +55,12 @@ const listadoPersonas = async () => {
   }
 };
 
-const agregarPersona = async (persona) => {
+const agregarPersona = async (persona, callback) => {
   try {
     // Validamos que el email tiene un formato correcto antes de hacer la petición
     if (!persona.email.includes("@") || !persona.email.includes(".")) {
       alert("Por favor, introduce un email válido.");
+      callback(false); // Indica que hubo un error
       return;
     }
 
@@ -74,14 +75,17 @@ const agregarPersona = async (persona) => {
     if (!response.ok) {
       console.error("Error al agregar persona:", personaCreada);
       alert(personaCreada.email ? personaCreada.email[0] : "Error desconocido");
+      callback(false); // Indica que hubo un error
       return;
     }
 
     personas.value = [...personas.value, personaCreada];
     store.increment();
-    return true; // Indica que la persona se agregó correctamente
+    callback(true); // Indica que hubo un error
+
   } catch (error) {
     console.error(error);
+    callback(false); // Indica que hubo un error
   }
 };
 
