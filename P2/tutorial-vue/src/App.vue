@@ -86,7 +86,6 @@ const agregarPersona = async (persona, callback) => {
     personas.value = [...personas.value, personaCreada];
     store.increment();
     callback(true); // Indica que hubo un error
-
   } catch (error) {
     console.error(error);
     callback(false); // Indica que hubo un error
@@ -118,14 +117,11 @@ const actualizarPersona = async (id, personaActualizada) => {
   }
 
   try {
-    const response = await fetch(
-      API_URL + personaActualizada.id + "/",
-      {
-        method: "PUT",
-        body: JSON.stringify(personaActualizada),
-        headers: { "Content-type": "application/json; charset=UTF-8" },
-      }
-    );
+    const response = await fetch(API_URL + personaActualizada.id + "/", {
+      method: "PUT",
+      body: JSON.stringify(personaActualizada),
+      headers: { "Content-type": "application/json; charset=UTF-8" },
+    });
     const personaActualizadaJS = await response.json();
     personas.value = personas.value.map((u) =>
       u.id === personaActualizada.id ? personaActualizadaJS : u

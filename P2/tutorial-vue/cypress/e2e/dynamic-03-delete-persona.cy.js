@@ -15,7 +15,7 @@ context("Delete persona", () => {
       cy.get("[data-cy=surname]").type("Land");
       cy.get("[data-cy=email]").type("paco@land.com");
       cy.get("[data-cy=add-button]").click();
-      cy.wait(1000)
+      cy.wait(1000);
       cy.get("div.alert-success");
     });
 
@@ -32,7 +32,7 @@ context("Delete persona", () => {
             .find("[data-cy=delete-button]")
             .click();
 
-          cy.wait(1000)
+          cy.wait(1000);
 
           cy.get("table")
             .find("tr")
