@@ -14,6 +14,10 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls.static import static
+from django.conf import settings
+from django.views.generic import RedirectView
+from django.urls import include
 from django.contrib import admin
 from django.urls import path
 
@@ -22,33 +26,31 @@ urlpatterns = [
 ]
 
 
-
 # Use include() to add paths from the catalog application
-from django.urls import include
 
-# Redirige cualquier URL que comience con catalog/ a otro archivo: catalog/urls.py, 
+# Redirige cualquier URL que comience con
+#   catalog/ a otro archivo: catalog/urls.py,
 # donde se definirán las rutas específicas de la aplicación.
 urlpatterns += [
     path('catalog/', include('catalog.urls')),
 ]
 
 
-
 # Add URL maps to redirect the base URL to our application
-from django.views.generic import RedirectView
 
-# Queremos que cuando un usuario visite http://127.0.0.1:8000/, sea redirigido 
-# automáticamente a http://127.0.0.1:8000/catalog/. Para esto, usamos RedirectView.
+# Queremos que cuando un usuario visite http://127.0.0.1:8000/, sea redirigido
+# automáticamente a http://127.0.0.1:8000/catalog/. Para esto, usamos
+# RedirectView.
 urlpatterns += [
     path('', RedirectView.as_view(url='catalog/', permanent=True)),
 ]
 
 
-# Use static() to add URL mapping to serve static files during development (only)
-from django.conf import settings
-from django.conf.urls.static import static
+# Use static() to add URL mapping to serve static files during development
+# (only)
 
-# Indica a Django dónde encontrar los archivos estáticos (definidos en settings.py).
+# Indica a Django dónde encontrar los
+#   archivos estáticos (definidos en settings.py).
 # Solo funciona en el entorno de desarrollo.
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
@@ -57,5 +59,3 @@ urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += [
     path('accounts/', include('django.contrib.auth.urls')),
 ]
-
-

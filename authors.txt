@@ -1,0 +1,22 @@
+***************************************
+*                                     *
+*              EQUIPO 8               *
+*                                     *
+***************************************
+
+Autores:
+
+1. Ignacio Serena Montiel
+2. Marcos Muñoz Merchán
+
+
+#######################################################################################################
+# URLs relevantes para esta práctica:
+
+# - Proyecto de Django: https://psi-practica-2-persona-servidor-django.onrender.com/api/v1/personas/
+# - Proyecto de Vue.js: https://psi-1-ir6w.onrender.com
+# - Base de datos NEON: postgresql://PSI-Pr%C3%A1ctica2_owner:npg_iGcbABMC5X6a@ep-morning-wave-a90qnvuk-pooler.gwc.azure.neon.tech/PSI-Pr%C3%A1ctica2?sslmode=require
+
+# ¡IMPORTANTE!: Usar primero la URL de la API para que el frontend pueda acceder a los datos de la base de datos.
+                                                                       
+#######################################################################################################

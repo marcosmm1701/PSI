@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG') == 'True'
 
-                #psi-ruhh.onrender.com,localhost,127.0.0.1
+# psi-ruhh.onrender.com,localhost,127.0.0.1
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # Application definition
@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Add our new application
-    'catalog.apps.CatalogConfig', # This object was created for us in /catalog/apps.py
+    # This object was created for us in /catalog/apps.py
+    'catalog.apps.CatalogConfig',
     'django_extensions',
 ]
 
@@ -56,19 +57,23 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # whitenoise middleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # whitenoise middleware
 ]
 
 ROOT_URLCONF = 'locallibrary.urls'
 
-#especifica la ubicación donde Django busca plantillas
+# especifica la ubicación donde Django busca plantillas
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'], #Especifica la ubicación donde Django busca plantillas
-        'APP_DIRS': True,       #Más importante: le indica a Django que busque plantillas en un subdirectorio de cada aplicación en el proyecto
-        'OPTIONS': {            #También podemos especificar ubicaciones específicas para que Django busque directorios
-            'context_processors': [     
+        # Especifica la ubicación donde Django busca plantillas
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,  # Más importante: le indica a Django que busque
+                           # plantillas en un subdirectorio de cada
+                           # aplicación en el proyecto
+        'OPTIONS': {  # También podemos especificar ubicaciones
+                      # específicas para que Django busque directorios
+            'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -84,7 +89,8 @@ WSGI_APPLICATION = 'locallibrary.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-#IMPORTANTE: Configure TESTING en el archivo .env para usar la base de datos local o la de neon (NUBE)
+# IMPORTANTE: Configure TESTING en el archivo .env para usar la base de
+# datos local o la de neon (NUBE)
 print("TESTING:", os.getenv("TESTING"))
 
 if os.getenv("TESTING") == 'True':
@@ -97,7 +103,7 @@ if os.getenv("TESTING") == 'True':
         'HOST': 'localhost',
         'PORT': '5432',
     }
-    
+
 else:
     print("USANDO BASE DE DATOS NEON")
     db_from_env = dj_database_url.config(
@@ -113,23 +119,33 @@ DATABASES = {
 print(f"Using database: {DATABASES['default']['NAME']}")
 
 
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': (
+            'django.contrib.auth.password_validation.'
+            'UserAttributeSimilarityValidator'
+        ),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': (
+            'django.contrib.auth.password_validation.'
+            'MinimumLengthValidator'
+        ),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': (
+            'django.contrib.auth.password_validation.'
+            'CommonPasswordValidator'
+        ),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': (
+            'django.contrib.auth.password_validation.'
+            'NumericPasswordValidator'
+        ),
     },
 ]
 
@@ -152,7 +168,8 @@ USE_TZ = True
 # Configuración de archivos estáticos
 STATIC_URL = '/static/'  # URL base donde se accederán los archivos estáticos
 
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # Directorio donde se recopilarán los archivos estáticos
+# Directorio donde se recopilarán los archivos estáticos
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 # Default primary key field type
@@ -173,10 +190,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 STORAGES = {
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": (
+            "whitenoise.storage.CompressedManifestStaticFilesStorage"
+            if not DEBUG
+            else "django.contrib.staticfiles.storage.StaticFilesStorage"
+        ),
     },
 }
-
-
-
-    
