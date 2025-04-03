@@ -1,8 +1,9 @@
 from django.db import models
 from .player import Player
-from .round import Round
 from .constants import Scores
 from .other_models import LichessAPIError
+from .round import Round
+from .tournament import Tournament
 import requests
 from django.utils import timezone
 
@@ -10,7 +11,7 @@ class Game(models.Model):
     white = models.ForeignKey(Player, null=True, on_delete=models.CASCADE, related_name='games_as_white')
     black = models.ForeignKey(Player, null=True, on_delete=models.CASCADE,related_name='games_as_black')
     finished = models.BooleanField(default=False)
-    round = models.ForeignKey(Round, on_delete=models.RESTRICT)
+    round = models.ForeignKey("chess_models.Round", on_delete=models.RESTRICT, related_name="games") # Para eliminar importacion circular
     start_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
     result = models.CharField(
@@ -21,21 +22,21 @@ class Game(models.Model):
     rankingOrder = models.IntegerField(default=0, null=True)
 
     def __str__(self):
-        white_name = self.white.name if self.white else "Bye"
-        black_name = self.black.name if self.black else "Bye"
-        return f"Game {self.id}: {self.white} vs {self.black}"
+        white_name = self.white.lichess_username if self.white else "Bye"
+        black_name = self.black.lichess_username if self.black else "Bye"
+        return f'{white_name}({self.white.id}) vs {black_name}({self.black.id}) = {self.result}'
     
-    def get_lichess_game_result(self):
+    def get_lichess_game_result(self, lichess_game_id):
         """
         Obtiene el resultado de la partida desde Lichess.
         """
         
-        if not self.id or not self.white or not self.black:
+        if not lichess_game_id or not self.white or not self.black:
             print("Game ID or players not set.")
             return None
         
         else:
-            lichess_url = f"https://lichess.org/api/game/{self.id}"
+            lichess_url = f"https://lichess.org/api/game/{lichess_game_id}"
             
             try:
                 response = requests.get(lichess_url)
@@ -45,13 +46,10 @@ class Game(models.Model):
                 
                 game_data = response.json()
                 
-                # Procesamos el resultado del json
-                if game_data['id'] != self.id:
-                    raise LichessAPIError("ID de partida no coincide con el proporcionado")
-                
+                game_id = game_data['id']
                 speed = game_data['speed']
-                self.white = game_data['players']['white']['userId']
-                self.black = game_data['players']['black']['userId']
+                white_lichess_username = game_data['players']['white']['userId']
+                black_lichess_username = game_data['players']['black']['userId']
                 winner = game_data['winner']
                 
                 if winner == 'white':
@@ -62,16 +60,76 @@ class Game(models.Model):
                     self.result = Scores.DRAW
                     
                     
+                if self.white.lichess_username != white_lichess_username or self.black.lichess_username != black_lichess_username:
+                    raise LichessAPIError("Los lichess usernames no coinciden con los jugadores de la partida.")
+                 
+                """  
+                self.white = Player.objects.filter(models.Q(lichess_username=white_lichess_username)).first()
+                self.black = Player.objects.filter(models.Q(lichess_username=black_lichess_username)).first()
+                    
+                if not self.white or not self.black:
+                """ 
             except requests.exceptions.RequestException as e:
                 raise LichessAPIError(f"Error al conectar con Lichess en game: {str(e)}") 
             
-        return {
-            "result": self.result,
-            "white": self.white,
-            "black": self.black
-        }
+        return  self.result, white_lichess_username, black_lichess_username
         
 #Ignoramos swissByes porque vamos por continua
 def create_rounds(tournament, swissByes= []):
+    
+    if not tournament:
+        print("Error: El torneo no existe.")
+        return
+    
+    num_rounds = tournament.getRoundsCount()
+    num_players = tournament.getPlayersCount()
+    if num_rounds == 0:
+        print("No hay jugadores en el torneo.")
+        return
+
+    for round_num in range(1, num_rounds + 1):
+        
+        round_act = Round.objects.create(tournament=tournament)
+        
+        for num_A in range (1, num_players):
+            
+            
+            num_B = round_num - num_A + 1
+            
+            #si num_B es menor a 1 o mayor a la cantidad de jugadores significa 
+            #que el cálculo ha dado un número inválido. En este caso, usamos la segunda fórmula:
+            if num_B < 1 or num_B > num_players:
+                num_B = round_num - num_A + num_players
+                
+            if num_B == num_A:
+                num_B = num_players
+                
+            if num_A < num_B: #Evitamos repetir emparejamintos, ya que si A>B, ya se ha emparejado antes
+                
+                #Determinamos colores
+                if (num_A % 2 == num_B % 2):  # Ambos pares o impares
+                    # Menor tiene negras
+                    black_player = num_A
+                    white_player = num_B
+                else:
+                    # Menor tiene blancas
+                    black_player = num_B
+                    white_player = num_A
+    
+                player_A = tournament.players.all()[num_A - 1] 
+                player_B = tournament.players.all()[num_B - 1]
+                
+                if not player_A or not player_B:
+                    print(f"Error: Jugador {num_A} o {num_B} no encontrado.")
+                    return
+                
+                game = Game.objects.create(
+                    white=player_A,
+                    black=player_B,
+                    round=round_act,
+                )
+
+        tournament.round_set.add(round_act)
+        
         
     return

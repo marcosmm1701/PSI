@@ -3,7 +3,6 @@ from .constants import TournamentBoardType, TournamentSpeed, RankingSystem
 from .player import Player
 from .other_models import Referee
 from django.contrib.auth.models import User
-
 from django.utils import timezone
 
 
@@ -38,6 +37,7 @@ class Tournament(models.Model):
     timeControl = models.CharField(max_length=32, default='15+0')
     number_of_rounds_for_swiss = models.IntegerField(default=0)
     rankingList = models.ManyToManyField(RankingSystemClass, blank=True)
+    round_set = models.ManyToManyField("chess_models.Round", blank=True, related_name="tournaments")
     
 
     def __str__(self):
@@ -79,18 +79,13 @@ class Tournament(models.Model):
         return self.players.count()
     
 
-"""    
-class TournamentPlayer(models.Model):
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
-    player = models.ForeignKey(Player, on_delete=models.CASCADE)
-    order = models.IntegerField(null=True)
-    
-    class Meta:
-        ordering = ['order']
-    
-    def __str__(self):
-        return f"{self.player.name} - {self.tournament.name}"
-"""
+    def getRoundsCount(self):
+        """
+        Retorna la cantidad de rondas en el torneo.
+        """
+        num_players = self.getPlayersCount()
+        return num_players - 1 if num_players > 0 else 0
+
 
 def getRanking(self):
     pass
