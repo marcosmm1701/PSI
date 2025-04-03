@@ -12,3 +12,9 @@ class Referee(models.Model):
 class LichessAPIError(Exception):
     """Excepción para errores de la API de Lichess"""
     pass
+
+
+class Color(models.TextChoices):
+    WHITE = 'w', 'White'
+    BLACK = 'b', 'Black'
+    NOCOLOR = '-', 'No color'

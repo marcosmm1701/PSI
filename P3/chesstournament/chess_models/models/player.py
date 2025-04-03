@@ -22,6 +22,9 @@ class Player(models.Model):
     
     creation_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.lichess_username or self.name or str(self.id)
 
     class Meta:
         unique_together = ('name', 'email')  # La pareja (name, email) debe ser única
@@ -31,6 +34,8 @@ class Player(models.Model):
         """Sobrescribe save() para actualizar jugadores en lugar de duplicarlos."""
         if not self.id and not self.creation_date:
             self.creation_date = timezone.now()
+        
+        existing_player = None
         
         #Hemos separado las condiciones de jugador existente para evitar errores en los tests de tournament y game
         if self.lichess_username and self.lichess_username != "":
@@ -104,5 +109,4 @@ class Player(models.Model):
             return False
         
 
-    def __str__(self):
-        return self.lichess_username  or self.name or str(self.id)
+    

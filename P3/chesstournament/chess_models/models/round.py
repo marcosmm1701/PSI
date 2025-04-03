@@ -9,7 +9,8 @@ class Round(models.Model):
     finish = models.BooleanField(default=False)
     game_set = models.ManyToManyField("chess_models.Game", blank=True, related_name="games_set")
     
-    
+    def __str__(self):
+        return self.name
     
     #funcion extra hecha para la comprobación de los tests
     def print_round_details(round_obj):

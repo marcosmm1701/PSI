@@ -85,6 +85,17 @@ class Tournament(models.Model):
         """
         num_players = self.getPlayersCount()
         return num_players - 1 if num_players > 0 else 0
+    
+    def addToRankingList(self, rankingSystem):
+        """
+        Añade un sistema de ranking a la lista de sistemas de ranking del torneo.
+        """
+        # Convertimos el enum a instancia de RankingSystemClass
+        system, created = RankingSystemClass.objects.get_or_create(
+            value=rankingSystem.value,
+            defaults={'value': rankingSystem.value}
+        )
+        self.rankingList.add(system)
 
 
 def getRanking(self):

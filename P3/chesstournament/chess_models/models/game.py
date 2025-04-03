@@ -24,7 +24,8 @@ class Game(models.Model):
     def __str__(self):
         white_name = self.white.lichess_username if self.white else "Bye"
         black_name = self.black.lichess_username if self.black else "Bye"
-        return f'{white_name}({self.white.id}) vs {black_name}({self.black.id}) = {self.result}'
+        result_label = dict(Scores.choices).get(self.result, self.result)
+        return f'{white_name}({self.white.id}) vs {black_name}({self.black.id}) = {result_label}'
     
     def get_lichess_game_result(self, lichess_game_id):
         """
