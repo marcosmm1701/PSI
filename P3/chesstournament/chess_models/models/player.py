@@ -1,4 +1,5 @@
 from django.db import models
+from .other_models import LichessAPIError
 import requests
 from django.utils import timezone
 
@@ -28,13 +29,22 @@ class Player(models.Model):
     
     def save(self, *args, **kwargs):
         """Sobrescribe save() para actualizar jugadores en lugar de duplicarlos."""
-        existing_player = Player.objects.filter(
-            models.Q(email=self.email, name=self.name) |
-            models.Q(lichess_username=self.lichess_username) |
-            models.Q(fide_id=self.fide_id)
-        ).exclude(id=self.id).first()
-
+        if not self.id and not self.creation_date:
+            self.creation_date = timezone.now()
+        
+        #Hemos separado las condiciones de jugador existente para evitar errores en los tests de tournament y game
+        if self.lichess_username and self.lichess_username != "":
+            existing_player = Player.objects.filter(models.Q(lichess_username=self.lichess_username)).exclude(id=self.id).first()
+        
+        if self.fide_id and self.fide_id != "" and not existing_player:
+            existing_player = Player.objects.filter(models.Q(fide_id=self.fide_id)).exclude(id=self.id).first()
+        
+        if (self.email and self.email != "") and (self.name and self.name != "") and not existing_player:
+            existing_player = Player.objects.filter(models.Q(email=self.email, name=self.name)).exclude(id=self.id).first()
+            
+        # Si encontramos un jugador existente, actualizamos sus datos
         if existing_player:
+            self.id = existing_player.id  # Asignamos el ID del jugador existente
             # Copiamos los valores de los campos del modelo
             for field in self._meta.fields:
                 field_name = field.name
@@ -47,27 +57,52 @@ class Player(models.Model):
             return
 
         # Si el jugador tiene un lichess_username, actualizar sus ratings desde Lichess
-        if self.lichess_username:
-            self.update_lichess_ratings()
+        if self.check_lichess_user_exists():
+            self.get_lichess_user_ratings()
 
         # Guardamos el nuevo jugador
         super().save(*args, **kwargs)
         
         
         
-    def update_lichess_ratings(self):
+    def get_lichess_user_ratings(self):
+        """Obtiene las clasificaciones del usuario en Lichess y actualiza los valores en la base de datos."""
+        if self.check_lichess_user_exists() == False:
+            raise LichessAPIError("Nombre de usuario Lichess no proporcionado")
+        
         url = f"https://lichess.org/api/user/{self.lichess_username}"
-        response = requests.get(url)
-
-        if response.status_code == 200:
-            data = response.json()
-            perfs = data.get("perfs", {})
-            self.lichess_rating_bullet = perfs.get("bullet", {}).get("rating", 0)
-            self.lichess_rating_blitz = perfs.get("blitz", {}).get("rating", 0)
-            self.lichess_rating_rapid = perfs.get("rapid", {}).get("rating", 0)
-            self.lichess_rating_classical = perfs.get("classical", {}).get("rating", 0)
+        try:
+            response = requests.get(url, timeout=5)
             
+            if response.status_code == 200:
+                data = response.json()
+                perfs = data.get("perfs", {})
+                
+                self.lichess_rating_bullet = perfs.get("bullet", {}).get("rating", 0)
+                self.lichess_rating_blitz = perfs.get("blitz", {}).get("rating", 0)
+                self.lichess_rating_rapid = perfs.get("rapid", {}).get("rating", 0)
+                self.lichess_rating_classical = perfs.get("classical", {}).get("rating", 0)
+
+                #self.save()
+        except requests.exceptions.RequestException as e:
+            raise LichessAPIError(f"Error al conectar con Lichess: {str(e)}")
+    
+    
+    def check_lichess_user_exists(self):
+        
+        if not self.lichess_username:
+            return False
+        
+        url = f"https://lichess.org/api/user/{self.lichess_username}"
+        
+        try:
+            response = requests.get(url, timeout=5)
+            return response.status_code == 200
+        
+        except requests.exceptions.RequestException as e:
+            print(f"Error al verificar el usuario de Lichess: {str(e)}")
+            return False
         
 
     def __str__(self):
-        return self.name
+        return self.lichess_username  or self.name or str(self.id)

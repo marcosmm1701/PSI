@@ -1,6 +1,6 @@
 from django.test import TestCase, tag
 from chess_models.models import Referee
-# import requests
+import requests
 
 
 class RefereeModelTest(TestCase):
