@@ -160,7 +160,8 @@ class TournamentModelTest(TransactionTestCase):
         create_rounds(tournament)
         rounds = tournament.round_set.all()
         for i, round in enumerate(rounds):
-            # print(round)
+            #round.print_round_details()
+            #print("PARTIDAS:",round.game_set.all().count())
             for j, game in enumerate(round.game_set.all()):
                 # print("    ", game)
                 self.assertEqual(game.white, participants[solution[i][j][0]-1])

@@ -3,7 +3,6 @@ from .player import Player
 from .constants import Scores
 from .other_models import LichessAPIError
 from .round import Round
-from .tournament import Tournament
 import requests
 from django.utils import timezone
 
@@ -11,7 +10,7 @@ class Game(models.Model):
     white = models.ForeignKey(Player, null=True, on_delete=models.CASCADE, related_name='games_as_white')
     black = models.ForeignKey(Player, null=True, on_delete=models.CASCADE,related_name='games_as_black')
     finished = models.BooleanField(default=False)
-    round = models.ForeignKey("chess_models.Round", on_delete=models.RESTRICT, related_name="games") # Para eliminar importacion circular
+    round = models.ForeignKey(Round, on_delete=models.RESTRICT) # Para eliminar importacion circular
     start_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
     result = models.CharField(
@@ -74,7 +73,8 @@ class Game(models.Model):
                 raise LichessAPIError(f"Error al conectar con Lichess en game: {str(e)}") 
             
         return  self.result, white_lichess_username, black_lichess_username
-        
+    
+"""  
 #Ignoramos swissByes porque vamos por continua
 def create_rounds(tournament, swissByes= []):
     
@@ -82,7 +82,7 @@ def create_rounds(tournament, swissByes= []):
         print("Error: El torneo no existe.")
         return
     
-    num_rounds = tournament.getRoundsCount()
+    num_rounds = tournament.getRoundCount()
     num_players = tournament.getPlayersCount()
     if num_rounds == 0:
         print("No hay jugadores en el torneo.")
@@ -117,8 +117,8 @@ def create_rounds(tournament, swissByes= []):
                     black_player = num_B
                     white_player = num_A
     
-                player_A = tournament.players.all()[num_A - 1] 
-                player_B = tournament.players.all()[num_B - 1]
+                player_A = tournament.players.all()[white_player - 1] 
+                player_B = tournament.players.all()[black_player - 1]
                 
                 if not player_A or not player_B:
                     print(f"Error: Jugador {num_A} o {num_B} no encontrado.")
@@ -129,8 +129,53 @@ def create_rounds(tournament, swissByes= []):
                     black=player_B,
                     round=round_act,
                 )
+"""
 
-        tournament.round_set.add(round_act)
+
+def create_rounds(tournament,swissByes= []):
+    
+    """Here I check if the round is even or odd
+       because in even round the biggest number player takes white"""
+    
+    def emparejamiento_de_ronda(num_ronda, lista):
+        """Función para crear los emparejamientos de una ronda"""
+        round = Round.objects.create(name=f"Round {num_ronda}", tournament=tournament)
         
-        
-    return
+        if num_ronda %2 == 1:
+            for pos in range(mitad):
+                game = Game.objects.create(white=lista[pos], black=lista[num_players -1-pos], round=round)
+            
+        else:
+            game = Game.objects.create(white=lista[num_players -1], black=lista[0], round=round)
+            for pos in range(1,mitad):
+                game = Game.objects.create(white=lista[pos], black=lista[num_players -1-pos], round=round)
+    
+    
+    if not tournament or len(swissByes) < 0:
+        print("Error: El torneo no existe.")
+        return
+            
+    lista = tournament.getPlayers()
+    
+    if not lista:
+        print("No hay jugadores en el torneo.")
+        return
+    
+    num_players = tournament.getPlayersCount()
+
+    if num_players == 0:
+        print("No hay jugadores en el torneo.")
+        return
+    
+    mitad = int(num_players/2)
+    
+    emparejamiento_de_ronda(1, lista)
+    
+    for num_ronda in range(2,num_players):
+        jugador_fijo = lista[num_players-1] # Jugador fijo que no rota. Por convención, el último jugador.
+        del lista[num_players-1]
+        lista.extend(x for x in lista[0:mitad])
+        lista[0:mitad-1]=lista[mitad:num_players-1]
+        del lista[mitad-1:num_players-1]
+        lista.append(jugador_fijo)
+        emparejamiento_de_ronda(num_ronda, lista)

@@ -40,7 +40,7 @@ class Player(models.Model):
         #Hemos separado las condiciones de jugador existente para evitar errores en los tests de tournament y game
         if self.lichess_username and self.lichess_username != "":
             existing_player = Player.objects.filter(models.Q(lichess_username=self.lichess_username)).exclude(id=self.id).first()
-        
+
         if self.fide_id and self.fide_id != "" and not existing_player:
             existing_player = Player.objects.filter(models.Q(fide_id=self.fide_id)).exclude(id=self.id).first()
         

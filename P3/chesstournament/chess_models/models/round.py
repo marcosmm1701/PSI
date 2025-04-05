@@ -3,27 +3,27 @@ from django.utils import timezone
 
 class Round(models.Model):
     name = models.CharField(max_length= 128)
-    tournament = models.ForeignKey("chess_models.Tournament", on_delete=models.RESTRICT, related_name="rounds")
+    tournament = models.ForeignKey("Tournament", on_delete=models.RESTRICT)
     start_date = models.DateTimeField(default=timezone.now, null = True)
     end_date = models.DateTimeField(null = True)
     finish = models.BooleanField(default=False)
-    game_set = models.ManyToManyField("chess_models.Game", blank=True, related_name="games_set")
+    # game_set = models.ManyToManyField("chess_models.Game", blank=True, related_name="games_set")
     
     def __str__(self):
         return self.name
     
     #funcion extra hecha para la comprobación de los tests
-    def print_round_details(round_obj):
+    def print_round_details(self):
         """Imprime los detalles de una ronda con sus juegos asociados."""
         print("=== Round Details ===")
-        print(f"Round Name: {round_obj.name}")
-        print(f"Tournament: {round_obj.tournament.name if round_obj.tournament else 'Unknown'}")
-        print(f"Start Date: {round_obj.start_date}")
-        print(f"End Date: {round_obj.end_date if round_obj.end_date else 'Not Finished'}")
-        print(f"Finished: {'Yes' if round_obj.finish else 'No'}")
+        print(f"Round Name: {self.name}")
+        print(f"Tournament: {self.tournament.name if self.tournament else 'Unknown'}")
+        print(f"Start Date: {self.start_date}")
+        print(f"End Date: {self.end_date if self.end_date else 'Not Finished'}")
+        print(f"Finished: {'Yes' if self.finish else 'No'}")
         print("\n--- Games in this Round ---")
         
-        games = round_obj.games.all()
+        games = self.game_set.all()
         if games.exists():
             for game in games:
                 print(game)

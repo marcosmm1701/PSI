@@ -613,7 +613,7 @@ class TournamentModelTestExtension(TransactionTestCase):
 
         blacktimes = RankingSystem.BLACKTIMES
         for k, v in resultsPoints.items():
-            # print(k, v)
+            #print(v, k)
             self.assertEqual(v[blacktimes],
                              results[k.name][2])
         playersList = getRanking(tournament)
