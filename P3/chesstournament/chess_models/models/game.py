@@ -62,13 +62,7 @@ class Game(models.Model):
                     
                 if self.white.lichess_username != white_lichess_username or self.black.lichess_username != black_lichess_username:
                     raise LichessAPIError("Los lichess usernames no coinciden con los jugadores de la partida.")
-                 
-                """  
-                self.white = Player.objects.filter(models.Q(lichess_username=white_lichess_username)).first()
-                self.black = Player.objects.filter(models.Q(lichess_username=black_lichess_username)).first()
-                    
-                if not self.white or not self.black:
-                """ 
+               
             except requests.exceptions.RequestException as e:
                 raise LichessAPIError(f"Error al conectar con Lichess en game: {str(e)}") 
             

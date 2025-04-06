@@ -44,7 +44,7 @@ class Tournament(models.Model):
     administrariveUser = models.ForeignKey(User, on_delete=models.RESTRICT, null=True)
     players = models.ManyToManyField(Player, blank=True, through=TournamentPlayer)
     referee = models.ForeignKey(Referee, on_delete=models.RESTRICT, null= True)
-    start_date = models.DateTimeField(default=timezone.now, null=True)
+    start_date = models.DateTimeField(auto_now=True, null=True)
     end_date = models.DateTimeField(null=True)
     max_update_time = models.IntegerField(default=43200)
     only_administrative = models.BooleanField(default=False)
@@ -90,6 +90,19 @@ class Tournament(models.Model):
         else:
             # Si no hay criterio específico, devolvemos en orden de inserción
             return list(self.players.all())
+        
+    def getGames(self):
+        """
+        Obtiene la lista de juegos en el torneo.
+        """
+        rounds = self.round_set.all()
+        games = []
+        for round in rounds:
+            games += round.game_set.all()
+            
+        return games 
+        
+        
         
     def getPlayersCount(self):
         """
