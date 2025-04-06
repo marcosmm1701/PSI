@@ -4,6 +4,7 @@ from chess_models.models import Player, LichessAPIError
 from django.test import TransactionTestCase, tag
 import requests
 import uuid
+from unittest.mock import patch
 
 
 class PlayerModelTest(TransactionTestCase):
@@ -116,3 +117,49 @@ class PlayerModelTest(TransactionTestCase):
         self.assertEqual(str(player2), name)
         self.assertEqual(player2.country, 'ES')
         self.assertEqual(player.id, player2.id)
+        
+        
+        
+        
+            ################## TESTS EXTRA ################
+            
+            
+    @tag("continua")
+    @patch("requests.get", side_effect=requests.exceptions.RequestException("Error simulado"))
+    def test_008_get_lichess_user_ratings_connection_error(self, mock_get):
+        """Debe lanzar LichessAPIError si falla la conexión a Lichess en get_lichess_user_ratings"""
+        player = Player(lichess_username="testuser")
+        with self.assertRaises(LichessAPIError) as cm:
+            player.get_lichess_user_ratings()
+        self.assertIn("Nombre de usuario Lichess no proporcionado", str(cm.exception))
+        
+    
+    @tag("continua")
+    @patch("requests.get")
+    def test_010_get_lichess_user_ratings_request_exception(self, mock_get):
+        """
+        Debe lanzar LichessAPIError si requests.get lanza una RequestException
+        al intentar obtener los ratings de Lichess.
+        """
+        # Simulamos que requests.get lanza una RequestException
+        mock_get.side_effect = requests.exceptions.RequestException("Falla de red simulada")
+
+        player = Player(lichess_username="fake_user")
+
+        with self.assertRaises(LichessAPIError) as context:
+            player.get_lichess_user_ratings()
+
+        self.assertIn("Nombre de usuario Lichess no proporcionado", str(context.exception))
+        
+        
+        
+    @tag("continua")
+    @patch("builtins.print")
+    @patch("requests.get", side_effect=requests.exceptions.RequestException("Error simulado"))
+    def test_009_check_lichess_user_exists_connection_error(self, mock_get, mock_print):
+        """Debe retornar False y mostrar un mensaje si falla la conexión en check_lichess_user_exists"""
+        player = Player(lichess_username="testuser")
+        exists = player.check_lichess_user_exists()
+        self.assertFalse(exists)
+        mock_print.assert_called_with("Error al verificar el usuario de Lichess: Error simulado")
+

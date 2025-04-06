@@ -7,7 +7,7 @@ class Round(models.Model):
     start_date = models.DateTimeField(default=timezone.now, null = True)
     end_date = models.DateTimeField(null = True)
     finish = models.BooleanField(default=False)
-    # game_set = models.ManyToManyField("chess_models.Game", blank=True, related_name="games_set")
+    
     
     def __str__(self):
         return self.name
