@@ -40,9 +40,11 @@ class TournamentViewSet(viewsets.ModelViewSet):
 
 
 class CustomUserViewSet(UserViewSet):
+    
     def create(self, request, *args, **kwargs):
         return Response({"result": False, "message": "User creation not allowed via API"},
-                        status=status.HTTP_403_FORBIDDEN)
+                        status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
         
         
         
@@ -109,6 +111,7 @@ class RoundViewSet(viewsets.ModelViewSet):
     
 class CreateRoundAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    
     def post(self, request):
         tournament_id = int(request.data.get('tournament_id'))
         if not tournament_id:
@@ -263,24 +266,22 @@ class GetRanking(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
         ranking_data = getRanking(tournament)
-        result = []
+        result = {}
 
-        for idx, player_data in enumerate(ranking_data, start=1):
-            player = player_data['player']
+        for player, player_data in ranking_data.items():
             entry = {
                 "id": player.id,
                 "name": player.lichess_username if player.lichess_username else player.name,
-                "score": player_data.get("score", 0),
-                "rank": idx
+                "score": player_data.get("PS", 0),
+                "rank": player_data.get("rank", 0)
             }
 
-            # Métricas adicionales si existen
             if "WI" in player_data:
                 entry["WI"] = player_data["WI"]
             if "BT" in player_data:
                 entry["BT"] = player_data["BT"]
 
-            result.append(entry)
+            result[player.id] = entry
 
         return Response(result, status=status.HTTP_200_OK)
     
@@ -378,12 +379,14 @@ class UpdateLichessGameAPIView(APIView):
         except LichessAPIError as e:
             return Response({"result": False, "message": str(e)
                              }, status=status.HTTP_400_BAD_REQUEST)
+            
+        
 
         
-        game.result = winner  # 'w', 'b' o '='
+        game.result = winner.value  # 'w', 'b' o '='
         game.finished = True
         game.save()
-
+        
         return Response({"result": True, "message": "Game result updated from Lichess"
                         },status=status.HTTP_200_OK)
                         
@@ -448,8 +451,8 @@ class AdminUpdateGameAPIView(APIView):
                              }, status=status.HTTP_404_NOT_FOUND)
 
         tournament = game.round.tournament
-        if tournament.administrariveUser != request.user:
-            return Response({"result": False, "message": "Only the tournament creator can update the game"
+        if tournament.administrativeUser != request.user:
+            return Response({"result": False, "message": "Only the user that create the tournament can update it"
                              }, status=status.HTTP_403_FORBIDDEN)
 
         if otb_result not in ['w', 'b', 'd']:

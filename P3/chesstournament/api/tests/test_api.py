@@ -653,7 +653,7 @@ class UpdateLichessGameAPIView(TransactionTestCase):
             url = self.update_lichess_game_url
             response = self.client.post(url, data)
             results = response.json()
-            print("RESULTADOO:", response)
+
             game2 = Game.objects.get(id=game_id)
             self.assertEqual(result, game2.result)
             self.assertEqual(results['result'], True)
@@ -961,7 +961,7 @@ class GetRankingAPIViewTest(TransactionTestCase):
                        'blacktimes': 3, 'rank': 16}  # noqa E201
 
         for k, v in data.items():
-            # print(k, v)
+            #print(v, k)
             self.assertEqual(v['score'],
                              playerD[v['id']]['score'])
             self.assertEqual(
@@ -970,6 +970,9 @@ class GetRankingAPIViewTest(TransactionTestCase):
             self.assertEqual(
                 v[RankingSystem.BLACKTIMES.value],
                 playerD[v['id']]['blacktimes'])
+            #print(playerD)
+            #print(f"Esperado para id {v['id']}: {playerD[v['id']]['rank']}, Obtenido: {v['rank']}")
+
             self.assertEqual(v['rank'], playerD[v['id']]['rank'])
 
     @tag("suiza")

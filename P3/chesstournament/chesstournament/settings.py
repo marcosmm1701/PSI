@@ -60,6 +60,14 @@ REST_FRAMEWORK = {
 }
 
 
+# Configuración de djoser
+DJOSER = {
+    'USER_ID_FIELD': 'username',
+    'USER_CREATE_PASSWORD_RETYPE': False,
+    'CREATE_USER': False
+}
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
