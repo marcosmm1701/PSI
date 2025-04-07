@@ -42,15 +42,15 @@ class Game(models.Model):
                 response = requests.get(lichess_url)
                 
                 if response.status_code != 200:
-                    raise LichessAPIError("Error al conectar con Lichess en game")
+                    raise LichessAPIError("Failed to fetch data for game")
                 
                 game_data = response.json()
-                
+
                 game_id = game_data['id']
                 speed = game_data['speed']
                 white_lichess_username = game_data['players']['white']['userId']
                 black_lichess_username = game_data['players']['black']['userId']
-                winner = game_data['winner']
+                winner = game_data.get('winner')
                 
                 if winner == 'white':
                     self.result = Scores.WHITE
@@ -59,9 +59,12 @@ class Game(models.Model):
                 else:
                     self.result = Scores.DRAW
                     
-                    
-                if self.white.lichess_username != white_lichess_username or self.black.lichess_username != black_lichess_username:
-                    raise LichessAPIError("Los lichess usernames no coinciden con los jugadores de la partida.")
+                if (self.white.lichess_username.lower() != white_lichess_username.lower() or self.black.lichess_username.lower() != black_lichess_username.lower()):
+                    raise LichessAPIError(
+                        f"Players for game {game_id} are different: "
+                        f"Expected {self.white.lichess_username}(white) vs {self.black.lichess_username}(black), "
+                        f"got {white_lichess_username}(white) vs {black_lichess_username}(black)"
+                    )
                
             except requests.exceptions.RequestException as e:
                 raise LichessAPIError(f"Error al conectar con Lichess en game: {str(e)}") 

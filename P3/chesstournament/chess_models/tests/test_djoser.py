@@ -5,7 +5,7 @@ from rest_framework import status
 from django.contrib.auth.models import User
 
 # You may modoify this variables to match your project
-BASE_URL = '/api/v1/'
+BASE_URL = 'http://127.0.0.1:8081/api/v1/'
 
 # Do not modify the code below
 
@@ -37,7 +37,9 @@ class DjoserEndpointsTest(TestCase):
             'password': new_password,
         }
         response = self.client.post(BASE_URL + 'users/', data)
-
+        print("URL: ", BASE_URL + 'users/')
+        print("DATA: ", data)
+        print("RESPONSE: ", response)
         # Check if the user has been created successfully
         self.assertEqual(response.status_code,
                          status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -82,6 +84,7 @@ class DjoserEndpointsTest(TestCase):
             'username': 'testuser',
             'password': 'testpassword',
         }
+
         response = self.client.post(BASE_URL + 'token/login/', data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Assert that a token is returned in the response

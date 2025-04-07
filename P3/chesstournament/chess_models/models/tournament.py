@@ -41,7 +41,7 @@ class TournamentPlayer(models.Model):
 class Tournament(models.Model):
     
     name = models.CharField(max_length=128, unique=True, null=True, blank=True)
-    administrariveUser = models.ForeignKey(User, on_delete=models.RESTRICT, null=True)
+    administrativeUser = models.ForeignKey(User, on_delete=models.RESTRICT, null=True)
     players = models.ManyToManyField(Player, blank=True, through=TournamentPlayer)
     referee = models.ForeignKey(Referee, on_delete=models.RESTRICT, null= True)
     start_date = models.DateTimeField(auto_now=True, null=True)
@@ -158,7 +158,7 @@ class Tournament(models.Model):
         """
         Limpia la lista de sistemas de ranking del torneo.
         """
-        self.rankingSystem.clear()
+        self.rankingList.clear()
         
         
     def get_number_of_rounds_with_games(self):
@@ -218,10 +218,10 @@ def getScores(tournament):
                 
             elif game.result == Scores.FORFEITWIN.value:
                 results[game.white][PLAIN_SCORE] += tournament.win_points
-                
+            """
             elif game.result == Scores.FORFEITLOSS.value:
                 results[game.black][PLAIN_SCORE] += tournament.win_points
-                
+            """
         else:
             
             if game.result == Scores.BYE_F.value:
@@ -238,9 +238,10 @@ def getScores(tournament):
                     
             elif game.result == Scores.BYE_H.value:
                 if game.white:
-                    results[game.white][PLAIN_SCORE] += round(tournament.win_points / 2, 0)
+                    results[game.white][PLAIN_SCORE] += tournament.draw_points
                 elif game.black:
-                    results[game.black][PLAIN_SCORE] += round(tournament.win_points / 2, 0)
+                    results[game.black][PLAIN_SCORE] += tournament.draw_points
+
                     
             elif game.result == Scores.BYE_Z.value:
                 continue
@@ -308,6 +309,7 @@ def getRanking(tournament):
             players,
             key=lambda p: tuple(
                 -results[p].get(criterion, 0) if criterion in [PLAIN_SCORE, WINS] 
+                else -results[p].get(criterion, 0) if criterion == BLACKTIMES  # más negras, mejor
                 else results[p].get(criterion, 0)
                 for criterion in ranking_criteria
             )

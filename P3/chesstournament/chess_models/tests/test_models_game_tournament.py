@@ -170,6 +170,7 @@ class TournamentModelTestExtension(TransactionTestCase):
         score = RankingSystem.PLAIN_SCORE
         for player, points in playersList.items():
             # print(player.name, points, flush=True)
+            #print(f"{player.name} {points[score]}", flush=True)
             self.assertEqual(points[score], results[player.name][0])
             # self.assertEqual(points['points_buchholt'],
             #                 results[player.name][1])
