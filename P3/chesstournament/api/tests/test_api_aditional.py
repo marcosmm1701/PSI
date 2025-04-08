@@ -437,7 +437,7 @@ class TournamentCreateAPIViewTest(TransactionTestCase):
 
         self.client.force_authenticate(user=self.user)
         response = self.client.post(self.url, data)
-        print("Response:", response)
+        #print("Response:", response)
         # Asegura que el torneo fue creado correctamente
         self.assertEqual(response.status_code, 201)
         tournament_id = response.data['id']
@@ -481,3 +481,81 @@ class GetRankingAPIViewTest(TransactionTestCase):
         
         
         
+class continuaAPITest(TransactionTestCase):
+    """Test for the continua API"""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.base_url = "/api/v1/get_round_results/"
+
+    @tag("continua")
+    def test_tournament_does_not_exist(self):
+        """Debe devolver 404 si el torneo no existe"""
+        response = self.client.get(f"{self.base_url}9999/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data["result"], False)
+        self.assertIn("not found", response.data["message"])
+
+    @tag("continua")
+    def test_tournament_has_no_rounds(self):
+        """Torneo existe pero no tiene rondas"""
+        tournament = Tournament.objects.create(
+            name="Empty Tournament",
+            tournament_type=TournamentType.ROUNDROBIN,
+            board_type=TournamentBoardType.OTB
+        )
+
+        response = self.client.get(f"{self.base_url}{tournament.id}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {})  # Dict vacío si no hay rondas
+
+    @tag("continua")
+    def test_round_with_games_and_players(self):
+        """Debe devolver información de rondas con partidas y jugadores"""
+        tournament = Tournament.objects.create(
+            name="Full Tournament",
+            tournament_type=TournamentType.ROUNDROBIN,
+            board_type=TournamentBoardType.OTB
+        )
+
+        player_white = Player.objects.create(name="Magnus")
+        player_black = Player.objects.create(name="Ian")
+
+        rnd = Round.objects.create(tournament=tournament, name="Round 1")
+        Game.objects.create(round=rnd, white=player_white, black=player_black, result="W")
+
+        response = self.client.get(f"{self.base_url}{tournament.id}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verificar estructura del dict
+        round_data = response.data["0"]
+        self.assertEqual(round_data["round_name"], "Round 1")
+        self.assertIn("games", round_data)
+
+        game = round_data["games"]["1"]
+        self.assertEqual(game["white_name"], "Magnus")
+        self.assertEqual(game["black_name"], "Ian")
+        self.assertEqual(game["result"], "W")
+
+    @tag("continua")
+    def test_round_with_lichess_usernames(self):
+        """Verifica que use lichess_username si está disponible"""
+        tournament = Tournament.objects.create(
+            name="Lichess Tournament",
+            tournament_type=TournamentType.ROUNDROBIN,
+            board_type=TournamentBoardType.LICHESS
+        )
+
+        white = Player.objects.create(lichess_username="superGM")
+        black = Player.objects.create(name="Backup Name")
+
+        rnd = Round.objects.create(tournament=tournament, name="Round 1")
+        Game.objects.create(round=rnd, white=white, black=black, result="W")
+
+        response = self.client.get(f"{self.base_url}{tournament.id}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        game = response.data["0"]["games"]["1"]
+        self.assertEqual(game["white_name"], "superGM")
+        self.assertEqual(game["black_name"], "Backup Name")
+        self.assertEqual(game["result"], "W")

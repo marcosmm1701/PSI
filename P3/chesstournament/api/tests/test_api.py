@@ -224,7 +224,7 @@ class GameAPITest(TransactionTestCase):
             Note: this sgould not work if no login has been made
             """
         self.client.force_authenticate(user=self.user1)
-        tournament = Tournament.objects.create(name="tournament_1",)
+        tournament = Tournament.objects.create(name="tournament_1", administrativeUser=self.user1)
         round = Round.objects.create(name="round_1", tournament=tournament)
         player1 = Player.objects.create(name="player_1")
         player2 = Player.objects.create(name="player_2")
@@ -271,7 +271,8 @@ class GameAPITest(TransactionTestCase):
     def test_004_update(self):  # OK
         """Update a game withOUT login in and finished=False.
           It should work """
-        self.client.force_authenticate(user=self.user1)
+        # No need to login first
+        # self.client.force_authenticate(user=self.user1)
         tournament = Tournament.objects.create(name="tournament_1",)
         round = Round.objects.create(name="round_1", tournament=tournament)
         player1 = Player.objects.create(name="player_1")
@@ -653,7 +654,6 @@ class UpdateLichessGameAPIView(TransactionTestCase):
             url = self.update_lichess_game_url
             response = self.client.post(url, data)
             results = response.json()
-
             game2 = Game.objects.get(id=game_id)
             self.assertEqual(result, game2.result)
             self.assertEqual(results['result'], True)
@@ -961,7 +961,7 @@ class GetRankingAPIViewTest(TransactionTestCase):
                        'blacktimes': 3, 'rank': 16}  # noqa E201
 
         for k, v in data.items():
-            #print(v, k)
+            # print(k, v)
             self.assertEqual(v['score'],
                              playerD[v['id']]['score'])
             self.assertEqual(
@@ -970,9 +970,6 @@ class GetRankingAPIViewTest(TransactionTestCase):
             self.assertEqual(
                 v[RankingSystem.BLACKTIMES.value],
                 playerD[v['id']]['blacktimes'])
-            #print(playerD)
-            #print(f"Esperado para id {v['id']}: {playerD[v['id']]['rank']}, Obtenido: {v['rank']}")
-
             self.assertEqual(v['rank'], playerD[v['id']]['rank'])
 
     @tag("suiza")
