@@ -5,10 +5,14 @@ from chess_models.models import Tournament, Round, Game
 from chess_models.models import (getScores, getRanking,
                                  getBlackWins)
 try:
-    from chess_models.models import (getMediamBuchholz, getSonnebornBerger,
-                                     getBuchholzCutMinusOne,  getBuchholz,
-                                    getOpponents, getAdjustedScores, getPlayers
-                                     )
+    from chess_models.models import (
+        getMediamBuchholz,
+        getSonnebornBerger,
+        getBuchholzCutMinusOne,
+        getBuchholz,
+        getOpponents,
+        getAdjustedScores,
+        getPlayers)
 except ImportError:
     pass
 
@@ -119,7 +123,7 @@ class TournamentModelTestExtension(TransactionTestCase):
         tournament_name = 'tie-breaking exercises swiss'
         tournament = Tournament.objects.get(name=tournament_name)
         tournament.addToRankingList(RankingSystem.PLAIN_SCORE.value)  # ROB
-        playersList = getScores(tournament)  #  ROB
+        playersList = getScores(tournament)  # ROB
         for player, points in playersList.items():
             self.assertEqual(points[score], results[player.name][0])
         playersList = getRanking(tournament)
@@ -170,7 +174,7 @@ class TournamentModelTestExtension(TransactionTestCase):
         score = RankingSystem.PLAIN_SCORE
         for player, points in playersList.items():
             # print(player.name, points, flush=True)
-            #print(f"{player.name} {points[score]}", flush=True)
+            # print(f"{player.name} {points[score]}", flush=True)
             self.assertEqual(points[score], results[player.name][0])
             # self.assertEqual(points['points_buchholt'],
             #                 results[player.name][1])
@@ -201,7 +205,7 @@ class TournamentModelTestExtension(TransactionTestCase):
             self.assertEqual(points[score], results[player.name])
 
     @tag("suizo")
-    def test_013_tournament_getOpponents(self): # ROB no
+    def test_013_tournament_getOpponents(self):  # ROB no
         """Test function getPoints that returns a list of
         players"""
         # games between XXXX and [x,y,z,...]
@@ -375,7 +379,8 @@ class TournamentModelTestExtension(TransactionTestCase):
 
         resultsPoints = getScores(tournament)
         playersList = getOpponents(tournament, resultsPoints)
-        getAdjustedScoresList = getAdjustedScores(tournament, playersList)  # ROB
+        getAdjustedScoresList = getAdjustedScores(
+            tournament, playersList)  # ROB
         score = RankingSystem.PLAIN_SCORE
         for k, v in getAdjustedScoresList.items():
             # print(k.name, v[score], v['adjustedScore'])
@@ -614,7 +619,7 @@ class TournamentModelTestExtension(TransactionTestCase):
 
         blacktimes = RankingSystem.BLACKTIMES
         for k, v in resultsPoints.items():
-            #print(v, k)
+            # print(v, k)
             self.assertEqual(v[blacktimes],
                              results[k.name][2])
         playersList = getRanking(tournament)

@@ -76,7 +76,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
@@ -109,20 +108,19 @@ if os.getenv("TESTING") == 'True':
     DATABASES = {
         'default': dj_database_url.config(env='POSTGRESQL_URL')
     }
-    
 else:
     print("USANDO BASE DE DATOS NEON")
     DATABASES = {
         'default': dj_database_url.config(
-        default=os.getenv('NEON_URL'),
-        conn_max_age=600
+            default=os.getenv('NEON_URL'),
+            conn_max_age=600
         )
     }
-    
 
 
 # Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/4.2/ref
+# /settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {

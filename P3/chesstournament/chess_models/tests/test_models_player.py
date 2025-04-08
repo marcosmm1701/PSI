@@ -117,7 +117,3 @@ class PlayerModelTest(TransactionTestCase):
         self.assertEqual(str(player2), name)
         self.assertEqual(player2.country, 'ES')
         self.assertEqual(player.id, player2.id)
-        
-        
-        
-        

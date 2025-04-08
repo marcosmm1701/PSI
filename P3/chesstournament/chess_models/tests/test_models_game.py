@@ -47,7 +47,7 @@ class GameModelTest(TransactionTestCase):
             f'{str(white)}({white.id}) vs {str(black)}({black.id}) ='
             f' {Scores.WHITE.label}',
             str(game)
-            )
+        )
 
     # ROB: get_lichess_game_result needed
     @tag("continua")
@@ -67,8 +67,8 @@ class GameModelTest(TransactionTestCase):
     @tag("continua")
     def test_003_game_get_result_from_lichess_invalid_game_id(self):
         """given a lichess game_id get the result of the game.
-        gameID points to a game that has not been 
-        played by the players 'white.lichess_username' and 
+        gameID points to a game that has not been
+        played by the players 'white.lichess_username' and
         'black.lichess_username". A exception should be raised
         """
         game = Game.objects.create(round=self.round)
@@ -95,9 +95,3 @@ class GameModelTest(TransactionTestCase):
     def test_010_getcross_table(self):
         "test get_cross_table"
         pass
-    
-    
-    
-    
-    
-    

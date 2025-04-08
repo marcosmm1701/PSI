@@ -49,7 +49,7 @@ casitaResults = {('ertopo', 'soria49'): ('VrAvmsHj', w),
                  ('rmarabini', 'jpvalle'): ('55ig1Unu', w),
                  ('oliva21', 'rmarabini'): ('AR5pzMCh', b),
                  ('rmarabini', 'Philippe2020'): ('nCTZTPLJ', w),
-                 ('eaffelix', 'rmarabini'): ('MixjLiYJ', w), ##
+                 ('eaffelix', 'rmarabini'): ('MixjLiYJ', w),
                  ('rmarabini', 'jrcuesta'): ('TfRfymzv', w),
                  ('jpvalle', 'oliva21'): ('8sNzS9Gd', w),
                  ('Philippe2020', 'jpvalle'): ('Mwz7JDfV', w),
