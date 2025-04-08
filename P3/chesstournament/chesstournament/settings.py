@@ -102,9 +102,21 @@ WSGI_APPLICATION = 'chesstournament.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(env='POSTGRESQL_URL')
-}
+if os.getenv("TESTING") == 'True':
+    print("USANDO BASE DE DATOS LOCAL")
+    DATABASES = {
+        'default': dj_database_url.config(env='POSTGRESQL_URL')
+    }
+    
+else:
+    print("USANDO BASE DE DATOS NEON")
+    DATABASES = {
+        'default': dj_database_url.config(
+        default=os.getenv('NEON_URL'),
+        conn_max_age=600
+        )
+    }
+    
 
 
 # Password validation
