@@ -5,7 +5,7 @@ from rest_framework import status
 from django.contrib.auth.models import User
 
 # You may modoify this variables to match your project
-BASE_URL = 'http://127.0.0.1:8081/api/v1/auth/'
+BASE_URL = 'http://127.0.0.1:8081/api/v1/'
 
 # Do not modify the code below
 
