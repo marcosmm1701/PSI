@@ -130,12 +130,10 @@ class Tournament(models.Model):
         )
         if not created:
             print("Error: El objeto ya existe en la lista de ranking.")
-        try:
-            self.rankingList.add(ranking_obj)
-        except Exception as e:
-            print("Error: El objeto ya existe en la lista de ranking.")
-            print(f"Error: {e}")
-    
+            return
+
+        self.rankingList.add(ranking_obj)
+        
         return
     
     
@@ -150,9 +148,7 @@ class Tournament(models.Model):
             self.rankingList.remove(ranking_obj)
         except RankingSystemClass.DoesNotExist:
             print(f"No se encontró el ranking con valor '{ranking_value}' en RankingSystemClass.")
-        except Exception as e:
-            print(f"Error al eliminar ranking '{ranking_value}' de la lista: {e}")
-
+        
         
     def cleanRankingList(self):
         """
@@ -243,8 +239,8 @@ def getScores(tournament):
                     results[game.black][PLAIN_SCORE] += tournament.draw_points
 
                     
-            elif game.result == Scores.BYE_Z.value:
-                continue
+            #elif game.result == Scores.BYE_Z.value:
+                #continue
         
     
     return results
