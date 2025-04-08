@@ -4,7 +4,9 @@ pip3 install -r requirements.txt
 python3 manage.py makemigrations
 python3 manage.py migrate
 
-python manage.py collectstatic --noinput
+python3 manage.py collectstatic --noinput
+
+python3 manage.py populate
 
 python3 manage.py shell <<EOF
 from django.contrib.auth import get_user_model
