@@ -150,7 +150,7 @@ def create_rounds(tournament,swissByes= []):
     
     if not tournament or len(swissByes) < 0:
         print("Error: El torneo no existe.")
-        return -1
+        return 
             
     lista = tournament.getPlayers()
     
@@ -158,7 +158,7 @@ def create_rounds(tournament,swissByes= []):
 
     if num_players == 0 or not lista:
         print("No hay jugadores en el torneo.")
-        return -1
+        return 
     
     mitad = int(num_players/2)
     

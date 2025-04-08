@@ -11,3 +11,5 @@ admin.site.register(RankingSystemClass)
 admin.site.register(Referee)
 admin.site.register(Player)
 
+
+
