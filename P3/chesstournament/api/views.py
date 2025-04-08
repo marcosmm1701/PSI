@@ -132,20 +132,15 @@ class CreateRoundAPIView(APIView):
 
         # Llamamos a tu función
         res = create_rounds(tournament, [])
-        if (res == -1):
-            return Response({
-                "result": False,
-                "message": f"An error occurred while creating rounds: {str(e)}"
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
+        """
         if tournament.getRoundCount() == 0:
             return Response({
                 "result": False,
                 "message": f"Tournament with id {tournament_id} has no rounds"
             }, status=status.HTTP_400_BAD_REQUEST)
+        """
         
-        else:
-            return Response({
+        return Response({
                 "result": True,
                 "message": f"Rounds created successfully for tournament {tournament.name}"
             }, status=status.HTTP_201_CREATED)
@@ -457,3 +452,4 @@ class AdminUpdateGameAPIView(APIView):
 
         return Response({"result": True, "message": "Game updated by administrator"
                          }, status=status.HTTP_200_OK)
+    
