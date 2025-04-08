@@ -13,7 +13,7 @@ class RefereeModelTest(TestCase):
         try:
             referee = Referee.objects.create(
                 name=referee_name, refereeNumber=referee_number)
-        except :
+        except BaseException:
             referee = Referee.objects.create(
                 name=referee_name, referee_number=referee_number)
         self.assertEqual(referee.name, referee_name)
@@ -27,7 +27,7 @@ class RefereeModelTest(TestCase):
         try:
             referee = Referee.objects.create(
                 name=referee_name, refereeNumber=referee_number)
-        except :
+        except BaseException:
             referee = Referee.objects.create(
                 name=referee_name, referee_number=referee_number)
         self.assertEqual(

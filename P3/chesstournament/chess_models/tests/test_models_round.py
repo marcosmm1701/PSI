@@ -16,14 +16,9 @@ class RoundModelTest(TestCase):
         round = Round.objects.create(
             name=round_name, tournament=tournament)
         self.assertEqual(round.tournament, tournament)
-        
-
-
 
         ################## TESTS EXTRA ################
-        
-        
-        
+
     @tag("continua")
     def test_002_round_str_returns_name(self):
         "Test that __str__ method returns the name of the round"
@@ -52,7 +47,9 @@ class RoundModelTest(TestCase):
     def test_004_print_round_details_with_games(self, mock_stdout):
         "Test print_round_details when the round has associated games"
         tournament = Tournament.objects.create(name="Torneo Con Juegos")
-        round = Round.objects.create(name="Ronda Con Juegos", tournament=tournament)
+        round = Round.objects.create(
+            name="Ronda Con Juegos",
+            tournament=tournament)
 
         player1 = Player.objects.create(name="Jugador 1")
         player2 = Player.objects.create(name="Jugador 2")

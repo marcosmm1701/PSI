@@ -35,7 +35,7 @@ class Command(BaseCommand):
         Round.objects.all().delete()
         Player.objects.all().delete()
         Tournament.objects.all().delete()
-    
+
     def update_sequence(self):
         # since I have used the ID from the TRF file
         # I need to update the sequence to the last ID
@@ -67,7 +67,7 @@ class Command(BaseCommand):
         tour.save()
 
         # Create and save rounds for the tournament
-        for i in range(1, self.tour.numrounds+1):
+        for i in range(1, self.tour.numrounds + 1):
             r = Round(name=f"round_{i:02d}", tournament=tour)
             r.save()
             roundDict[i] = r

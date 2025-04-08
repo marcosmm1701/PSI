@@ -11,6 +11,7 @@ from io import StringIO
 
 from ..models.tournament import TournamentPlayer
 
+
 class TournamentModelTest(TransactionTestCase):
     reset_sequences = True
 
@@ -56,7 +57,7 @@ class TournamentModelTest(TransactionTestCase):
         try:
             referee = Referee.objects.create(
                 name=referee_name, refereeNumber=referee_number)
-        except :
+        except BaseException:
             referee = Referee.objects.create(
                 name=referee_name, referee_number=referee_number)
         tournament.referee = referee
@@ -82,7 +83,7 @@ class TournamentModelTest(TransactionTestCase):
         rankingSystem2 = RankingSystem.SONNEBORN_BERGER
         tournament.addToRankingList(rankingSystem1)
         tournament.addToRankingList(rankingSystem2)
-        
+
         rankingSystemList = [r.value for r in tournament.getRankingList()]
         self.assertEqual(tournament.rankingList.count(), 2)
         self.assertTrue(rankingSystem1 in rankingSystemList)
@@ -163,14 +164,16 @@ class TournamentModelTest(TransactionTestCase):
         create_rounds(tournament)
         rounds = tournament.round_set.all()
         for i, round in enumerate(rounds):
-            #round.print_round_details()
-            #print("PARTIDAS:",round.game_set.all().count())
+            # round.print_round_details()
+            # print("PARTIDAS:",round.game_set.all().count())
             for j, game in enumerate(round.game_set.all()):
                 # print("    ", game)
-                self.assertEqual(game.white, participants[solution[i][j][0]-1])
-                self.assertEqual(game.black, participants[solution[i][j][1]-1])
+                self.assertEqual(game.white,
+                                 participants[solution[i][j][0] - 1])
+                self.assertEqual(game.black,
+                                 participants[solution[i][j][1] - 1])
 
-    # Code written by studends in continuos mode 
+    # Code written by studends in continuos mode
     # does not need to satisfy the following tests
     # unless it is a resit
     @tag("odd")
@@ -213,18 +216,18 @@ class TournamentModelTest(TransactionTestCase):
             for j, game in enumerate(round.game_set.all()):
                 # print("    ", game)
                 if game.result == Scores.WHITE or\
-                      game.result == Scores.BLACK:
+                        game.result == Scores.BLACK:
                     self.assertEqual(
-                        game.white, participants[solution[i][j][0]-1])
+                        game.white, participants[solution[i][j][0] - 1])
                     self.assertEqual(
-                        game.black, participants[solution[i][j][1]-1])
+                        game.black, participants[solution[i][j][1] - 1])
                 elif game.result == Scores.BYE_U:
                     if solution[i][j][0] == 6:
                         self.assertEqual(
-                            game.white, participants[solution[i][j][1]-1])
+                            game.white, participants[solution[i][j][1] - 1])
                     else:
                         self.assertEqual(
-                            game.white, participants[solution[i][j][0]-1])
+                            game.white, participants[solution[i][j][0] - 1])
 
     @tag("double")
     def test_0075_tournament_create_double_round_same_dayeven(self):
@@ -272,8 +275,10 @@ class TournamentModelTest(TransactionTestCase):
             # print(round)
             for j, game in enumerate(round.game_set.all()):
                 # print("    ", game)
-                self.assertEqual(game.white, participants[solution[i][j][0]-1])
-                self.assertEqual(game.black, participants[solution[i][j][1]-1])
+                self.assertEqual(game.white,
+                                 participants[solution[i][j][0] - 1])
+                self.assertEqual(game.black,
+                                 participants[solution[i][j][1] - 1])
 
     @tag("double")
     def test_0076_tournament_create_round_odd(self):
@@ -325,18 +330,18 @@ class TournamentModelTest(TransactionTestCase):
             for j, game in enumerate(round.game_set.all()):
                 # print("    ", game)
                 if game.result == Scores.WHITE or\
-                      game.result == Scores.BLACK:
+                        game.result == Scores.BLACK:
                     self.assertEqual(
-                        game.white, participants[solution[i][j][0]-1])
+                        game.white, participants[solution[i][j][0] - 1])
                     self.assertEqual(
-                        game.black, participants[solution[i][j][1]-1])
+                        game.black, participants[solution[i][j][1] - 1])
                 elif game.result == Scores.BYE_U:
                     if solution[i][j][0] == 6:
                         self.assertEqual(
-                            game.white, participants[solution[i][j][1]-1])
+                            game.white, participants[solution[i][j][1] - 1])
                     else:
                         self.assertEqual(
-                            game.white, participants[solution[i][j][0]-1])
+                            game.white, participants[solution[i][j][0] - 1])
 
     @tag("double")
     def test_008_tournament_create_double_round_even(self):
@@ -373,7 +378,7 @@ class TournamentModelTest(TransactionTestCase):
             [[8, 3], [2, 4], [1, 5], [7, 6]],
             [[8, 4], [3, 5], [2, 6], [1, 7]],
             [[7, 8], [6, 1], [5, 2], [4, 3]]
-            ]
+        ]
 
         tournament_name = 'tournament_01'
         tournament = Tournament.objects.create(
@@ -394,8 +399,10 @@ class TournamentModelTest(TransactionTestCase):
             # print(round)
             for j, game in enumerate(round.game_set.all()):
                 # print("    ", game)
-                self.assertEqual(game.white, participants[solution[i][j][0]-1])
-                self.assertEqual(game.black, participants[solution[i][j][1]-1])
+                self.assertEqual(game.white,
+                                 participants[solution[i][j][0] - 1])
+                self.assertEqual(game.black,
+                                 participants[solution[i][j][1] - 1])
 
     @tag("suiza")
     def test_010_tournament_create_swiss_tournament_round_0(self):
@@ -403,15 +410,15 @@ class TournamentModelTest(TransactionTestCase):
         first round. No half byes or unplayed byes"""
         # Create players
         playerD = {}
-        playerD[ 1] = {'elo': 2200, 'name': 'Alyx'}  # noqa E201
-        playerD[ 2] = {'elo': 2150, 'name': 'Bruno'}  # noqa E201
-        playerD[ 3] = {'elo': 2100, 'name': 'Charline'}  # noqa E201
-        playerD[ 4] = {'elo': 2050, 'name': 'David'}  # noqa E201
-        playerD[ 5] = {'elo': 2000, 'name': 'Elene'}  # noqa E201
-        playerD[ 6] = {'elo': 1950, 'name': 'Franck'}  # noqa E201
-        playerD[ 7] = {'elo': 1900, 'name': 'Genevieve'}  # noqa E201
-        playerD[ 8] = {'elo': 1850, 'name': 'Irina'}  # noqa E201
-        playerD[ 9] = {'elo': 1800, 'name': 'Jessica'}  # noqa E201
+        playerD[1] = {'elo': 2200, 'name': 'Alyx'}  # noqa E201
+        playerD[2] = {'elo': 2150, 'name': 'Bruno'}  # noqa E201
+        playerD[3] = {'elo': 2100, 'name': 'Charline'}  # noqa E201
+        playerD[4] = {'elo': 2050, 'name': 'David'}  # noqa E201
+        playerD[5] = {'elo': 2000, 'name': 'Elene'}  # noqa E201
+        playerD[6] = {'elo': 1950, 'name': 'Franck'}  # noqa E201
+        playerD[7] = {'elo': 1900, 'name': 'Genevieve'}  # noqa E201
+        playerD[8] = {'elo': 1850, 'name': 'Irina'}  # noqa E201
+        playerD[9] = {'elo': 1800, 'name': 'Jessica'}  # noqa E201
         playerD[10] = {'elo': 1750, 'name': 'Lais'}
         playerD[11] = {'elo': 1700, 'name': 'Maria'}
         playerD[12] = {'elo': 1650, 'name': 'Nick (W)'}
@@ -449,7 +456,7 @@ class TournamentModelTest(TransactionTestCase):
                 {game.white, game.black},
                 {Player.objects.get(id=solution[i][0]),
                  Player.objects.get(id=solution[i][1])}
-                 )
+            )
 
     @tag("suiza")
     def test_011_tournament_create_swiss_tournament_round_0_with_manual_bye(
@@ -460,15 +467,15 @@ class TournamentModelTest(TransactionTestCase):
 
         # Create players
         playerD = {}
-        playerD[ 1] = {'rankAB':  1, 'elo': 2200, 'name': 'Alyx'}  # noqa E201
-        playerD[ 2] = {'rankAB':  2, 'elo': 2150, 'name': 'Bruno'}  # noqa E201
-        playerD[ 3] = {'rankAB':  3, 'elo': 2100, 'name': 'Charline'}  # noqa E201
-        playerD[ 4] = {'rankAB':  4, 'elo': 2050, 'name': 'David'}  # noqa E201
-        playerD[ 5] = {'rankAB':  5, 'elo': 2000, 'name': 'Elene'}  # noqa E201
-        playerD[ 6] = {'rankAB':  6, 'elo': 1950, 'name': 'Franck'}  # noqa E201
-        playerD[ 7] = {'rankAB':  7, 'elo': 1900, 'name': 'Genevieve'}  # noqa E201
-        playerD[ 8] = {'rankAB':  8, 'elo': 1850, 'name': 'Irina'}  # noqa E201
-        playerD[ 9] = {'rankAB':  9, 'elo': 1800, 'name': 'Jessica'}  # noqa E201
+        playerD[1] = {'rankAB': 1, 'elo': 2200, 'name': 'Alyx'}  # noqa E201
+        playerD[2] = {'rankAB': 2, 'elo': 2150, 'name': 'Bruno'}  # noqa E201
+        playerD[3] = {'rankAB': 3, 'elo': 2100, 'name': 'Charline'}  # noqa E201
+        playerD[4] = {'rankAB': 4, 'elo': 2050, 'name': 'David'}  # noqa E201
+        playerD[5] = {'rankAB': 5, 'elo': 2000, 'name': 'Elene'}  # noqa E201
+        playerD[6] = {'rankAB': 6, 'elo': 1950, 'name': 'Franck'}  # noqa E201
+        playerD[7] = {'rankAB': 7, 'elo': 1900, 'name': 'Genevieve'}  # noqa E201
+        playerD[8] = {'rankAB': 8, 'elo': 1850, 'name': 'Irina'}  # noqa E201
+        playerD[9] = {'rankAB': 9, 'elo': 1800, 'name': 'Jessica'}  # noqa E201
         playerD[10] = {'rankAB': 10, 'elo': 1750, 'name': 'Lais'}
         playerD[11] = {'rankAB': 11, 'elo': 1700, 'name': 'Maria'}
         playerD[12] = {'rankAB': 12, 'elo': 1650, 'name': 'Nick (W)'}
@@ -510,7 +517,7 @@ class TournamentModelTest(TransactionTestCase):
             self.assertEqual(
                 {game.white, game.black},
                 {white, black}
-                 )
+            )
 
     @tag("suiza")
     def test_012_tournament_create_swiss_tournament_round_0_with_umplayed_bye(
@@ -520,15 +527,15 @@ class TournamentModelTest(TransactionTestCase):
         lowest rank and no previous bye."""
         # Create players
         playerD = {}
-        playerD[ 1] = {'rankAB':  1, 'elo': 2200, 'name': 'Alyx'}  # noqa E201
-        playerD[ 2] = {'rankAB':  2, 'elo': 2150, 'name': 'Bruno'}  # noqa E201
-        playerD[ 3] = {'rankAB':  3, 'elo': 2100, 'name': 'Charline'}  # noqa E201
-        playerD[ 4] = {'rankAB':  4, 'elo': 2050, 'name': 'David'}  # noqa E201
-        playerD[ 5] = {'rankAB':  5, 'elo': 2000, 'name': 'Elene'}  # noqa E201
-        playerD[ 6] = {'rankAB':  6, 'elo': 1950, 'name': 'Franck'}  # noqa E201
-        playerD[ 7] = {'rankAB':  7, 'elo': 1900, 'name': 'Genevieve'}  # noqa E201
-        playerD[ 8] = {'rankAB':  8, 'elo': 1850, 'name': 'Irina'}  # noqa E201
-        playerD[ 9] = {'rankAB':  9, 'elo': 1800, 'name': 'Jessica'}  # noqa E201
+        playerD[1] = {'rankAB': 1, 'elo': 2200, 'name': 'Alyx'}  # noqa E201
+        playerD[2] = {'rankAB': 2, 'elo': 2150, 'name': 'Bruno'}  # noqa E201
+        playerD[3] = {'rankAB': 3, 'elo': 2100, 'name': 'Charline'}  # noqa E201
+        playerD[4] = {'rankAB': 4, 'elo': 2050, 'name': 'David'}  # noqa E201
+        playerD[5] = {'rankAB': 5, 'elo': 2000, 'name': 'Elene'}  # noqa E201
+        playerD[6] = {'rankAB': 6, 'elo': 1950, 'name': 'Franck'}  # noqa E201
+        playerD[7] = {'rankAB': 7, 'elo': 1900, 'name': 'Genevieve'}  # noqa E201
+        playerD[8] = {'rankAB': 8, 'elo': 1850, 'name': 'Irina'}  # noqa E201
+        playerD[9] = {'rankAB': 9, 'elo': 1800, 'name': 'Jessica'}  # noqa E201
         playerD[10] = {'rankAB': 10, 'elo': 1750, 'name': 'Lais'}
         playerD[11] = {'rankAB': 11, 'elo': 1700, 'name': 'Maria'}
         playerD[12] = {'rankAB': 12, 'elo': 1650, 'name': 'Nick (W)'}
@@ -574,7 +581,7 @@ class TournamentModelTest(TransactionTestCase):
                     {game.white, game.black},
                     {Player.objects.get(id=solution[i][0]),
                      Player.objects.get(id=solution[i][1])}
-                    )
+                )
 
         self.assertEqual(tournament.getPlayersCount(),
                          len(playerD))
@@ -589,15 +596,15 @@ class TournamentModelTest(TransactionTestCase):
     def test_013_tournament_create_swiss_tournament_round_1(self):
         # Create players
         playerD1 = {}
-        playerD1[ 1] = {'elo': 2200, 'name': 'Alyx'}  # noqa E201
-        playerD1[ 2] = {'elo': 2150, 'name': 'Bruno'}  # noqa E201
-        playerD1[ 3] = {'elo': 2100, 'name': 'Charline'}  # noqa E201
-        playerD1[ 4] = {'elo': 2050, 'name': 'David'}  # noqa E201
-        playerD1[ 5] = {'elo': 2000, 'name': 'Elene'}  # noqa E201
-        playerD1[ 6] = {'elo': 1950, 'name': 'Franck'}  # noqa E201
-        playerD1[ 7] = {'elo': 1900, 'name': 'Genevieve'}  # noqa E201
-        playerD1[ 8] = {'elo': 1850, 'name': 'Irina'}  # noqa E201
-        playerD1[ 9] = {'elo': 1800, 'name': 'Jessica'}  # noqa E201
+        playerD1[1] = {'elo': 2200, 'name': 'Alyx'}  # noqa E201
+        playerD1[2] = {'elo': 2150, 'name': 'Bruno'}  # noqa E201
+        playerD1[3] = {'elo': 2100, 'name': 'Charline'}  # noqa E201
+        playerD1[4] = {'elo': 2050, 'name': 'David'}  # noqa E201
+        playerD1[5] = {'elo': 2000, 'name': 'Elene'}  # noqa E201
+        playerD1[6] = {'elo': 1950, 'name': 'Franck'}  # noqa E201
+        playerD1[7] = {'elo': 1900, 'name': 'Genevieve'}  # noqa E201
+        playerD1[8] = {'elo': 1850, 'name': 'Irina'}  # noqa E201
+        playerD1[9] = {'elo': 1800, 'name': 'Jessica'}  # noqa E201
         playerD1[10] = {'elo': 1750, 'name': 'Lais'}
         playerD1[11] = {'elo': 1700, 'name': 'Maria'}
         playerD1[12] = {'elo': 1650, 'name': 'Nick (W)'}
@@ -637,7 +644,7 @@ class TournamentModelTest(TransactionTestCase):
                 {game.white, game.black},
                 {Player.objects.get(id=solution1[i][0]),
                  Player.objects.get(id=solution1[i][1])}
-                 )
+            )
         # save results in previous games
         games = {(1, 9): Scores.WHITE, (10, 2): Scores.BLACK,
                  (3, 11): Scores.DRAW, (12, 4): Scores.BLACK,
@@ -692,10 +699,10 @@ class TournamentModelTest(TransactionTestCase):
                     {game.white, game.black},
                     {Player.objects.get(id=solution2[i][0]),
                      Player.objects.get(id=solution2[i][1])}
-                    )
+                )
         # save results in previous games
         games2 = {(4, None): Scores.BYE_H, (15, None): Scores.BYE_U,
-                  (13, 1): Scores.DRAW,    (2, 7): Scores.BLACK,
+                  (13, 1): Scores.DRAW, (2, 7): Scores.BLACK,
                   (3, 16): Scores.BLACK, (11, 5): Scores.WHITE,
                   (6, 10): Scores.WHITE, (8, 14): Scores.DRAW,
                   (9, 12): Scores.DRAW
@@ -734,9 +741,7 @@ class TournamentModelTest(TransactionTestCase):
         for i, game in enumerate(round3.game_set.all().order_by('id')):
             # print("    ", game)
             self.assertEqual(
-               {game.white, game.black},
-               {Player.objects.get(id=solution3[i][0]),
-                Player.objects.get(id=solution3[i][1])}
-               )
-            
-            
+                {game.white, game.black},
+                {Player.objects.get(id=solution3[i][0]),
+                    Player.objects.get(id=solution3[i][1])}
+            )

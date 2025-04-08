@@ -14,6 +14,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='game',
             name='round',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.RESTRICT, to='chess_models.round'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.RESTRICT,
+                to='chess_models.round'),
         ),
     ]

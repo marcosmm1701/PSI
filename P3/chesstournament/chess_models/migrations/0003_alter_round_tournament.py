@@ -7,13 +7,14 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chess_models', '0002_remove_round_game_set_remove_tournament_round_set'),
-    ]
+        ('chess_models', '0002_remove_round_game_set_remove_tournament_round_set'), ]
 
     operations = [
         migrations.AlterField(
             model_name='round',
             name='tournament',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.RESTRICT, to='chess_models.tournament'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.RESTRICT,
+                to='chess_models.tournament'),
         ),
     ]
