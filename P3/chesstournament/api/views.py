@@ -40,7 +40,6 @@ class TournamentViewSet(viewsets.ModelViewSet):
 
 
 class CustomUserViewSet(UserViewSet):
-    
     def create(self, request, *args, **kwargs):
         return Response({"result": False, "message": "User creation not allowed via API"},
                         status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -65,7 +64,6 @@ class GameViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated()]
 
     def update(self, request, *args, **kwargs):
-
         game = self.get_object()
 
         if game.finished:
@@ -79,12 +77,6 @@ class GameViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(game, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         
-        #Nos asegúrate de que el resultado se valida como uno de los permitidos
-        result = serializer.validated_data.get('result')
-        if result and result not in Scores.values:
-            return Response({"result": False, "message": "Invalid result value"},
-                            status=status.HTTP_400_BAD_REQUEST)
-
         self.perform_update(serializer)
 
         game.finished = True
@@ -113,13 +105,14 @@ class CreateRoundAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def post(self, request):
-        tournament_id = int(request.data.get('tournament_id'))
-        if not tournament_id:
+        tournament_id = request.data.get('tournament_id')
+        if tournament_id is None:
             return Response({
                 "result": False,
                 "message": "Missing tournament_id"
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        tournament_id = int(tournament_id)
         # Buscamos el torneo
         try:
             tournament = Tournament.objects.get(id=tournament_id)
@@ -130,12 +123,6 @@ class CreateRoundAPIView(APIView):
                 "message": f"Tournament with id {tournament_id} does not exist"
             }, status=status.HTTP_404_NOT_FOUND)
             
-            
-        if not tournament:
-            return Response({
-                "result": False,
-                "message": f"Tournament with id {tournament_id} does not exist"
-            }, status=status.HTTP_404_NOT_FOUND)
                 
         if tournament.getPlayersCount() == 0:
             return Response({
@@ -144,9 +131,8 @@ class CreateRoundAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Llamamos a tu función
-        try:
-            create_rounds(tournament, [])
-        except Exception as e:
+        res = create_rounds(tournament, [])
+        if (res == -1):
             return Response({
                 "result": False,
                 "message": f"An error occurred while creating rounds: {str(e)}"
@@ -202,7 +188,7 @@ class TournamentCreateAPIView(APIView):
             # Creamos el torneo con los datos principales
             tournament = Tournament.objects.create(
                 name=name,
-                administrariveUser=request.user,  # Usa el usuario autenticado como administrador
+                administrativeUser=request.user,  # Usa el usuario autenticado como administrador
                 only_administrative=request.data.get("only_administrative", False),
                 tournament_type=request.data.get("tournament_type"),
                 board_type=request.data.get("board_type"),

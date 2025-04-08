@@ -37,9 +37,6 @@ class DjoserEndpointsTest(TestCase):
             'password': new_password,
         }
         response = self.client.post(BASE_URL + 'users/', data)
-        print("URL: ", BASE_URL + 'users/')
-        print("DATA: ", data)
-        print("RESPONSE: ", response)
         # Check if the user has been created successfully
         self.assertEqual(response.status_code,
                          status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -76,22 +76,16 @@ class Player(models.Model):
             raise LichessAPIError("Nombre de usuario Lichess no proporcionado")
         
         url = f"https://lichess.org/api/user/{self.lichess_username}"
-        try:
-            response = requests.get(url, timeout=5)
+        response = requests.get(url, timeout=5)
             
-            if response.status_code == 200:
-                data = response.json()
-                perfs = data.get("perfs", {})
+        if response.status_code == 200:
+            data = response.json()
+            perfs = data.get("perfs", {})
                 
-                self.lichess_rating_bullet = perfs.get("bullet", {}).get("rating", 0)
-                self.lichess_rating_blitz = perfs.get("blitz", {}).get("rating", 0)
-                self.lichess_rating_rapid = perfs.get("rapid", {}).get("rating", 0)
-                self.lichess_rating_classical = perfs.get("classical", {}).get("rating", 0)
-
-                #self.save()
-        except requests.exceptions.RequestException as e:
-            raise LichessAPIError(f"Error al conectar con Lichess: {str(e)}")
-    
+            self.lichess_rating_bullet = perfs.get("bullet", {}).get("rating", 0)
+            self.lichess_rating_blitz = perfs.get("blitz", {}).get("rating", 0)
+            self.lichess_rating_rapid = perfs.get("rapid", {}).get("rating", 0)
+            self.lichess_rating_classical = perfs.get("classical", {}).get("rating", 0)
     
     def check_lichess_user_exists(self):
         

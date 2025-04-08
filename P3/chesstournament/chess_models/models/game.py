@@ -10,7 +10,7 @@ class Game(models.Model):
     white = models.ForeignKey(Player, null=True, on_delete=models.CASCADE, related_name='games_as_white')
     black = models.ForeignKey(Player, null=True, on_delete=models.CASCADE,related_name='games_as_black')
     finished = models.BooleanField(default=False)
-    round = models.ForeignKey(Round, on_delete=models.RESTRICT) # Para eliminar importacion circular
+    round = models.ForeignKey(Round, on_delete=models.RESTRICT)
     start_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
     result = models.CharField(
@@ -150,19 +150,15 @@ def create_rounds(tournament,swissByes= []):
     
     if not tournament or len(swissByes) < 0:
         print("Error: El torneo no existe.")
-        return
+        return -1
             
     lista = tournament.getPlayers()
     
-    if not lista:
-        print("No hay jugadores en el torneo.")
-        return
-    
     num_players = tournament.getPlayersCount()
 
-    if num_players == 0:
+    if num_players == 0 or not lista:
         print("No hay jugadores en el torneo.")
-        return
+        return -1
     
     mitad = int(num_players/2)
     
