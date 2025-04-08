@@ -1,10 +1,12 @@
 from django.test import tag, TransactionTestCase
 from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
-from chess_models.models import Game, Player, Tournament, Round, TournamentBoardType, TournamentType, Scores, TournamentPlayer
+from chess_models.models import Game, Player, Tournament, RankingSystemClass, Round, TournamentBoardType, TournamentType, Scores, TournamentPlayer, RankingSystem
 from django.contrib.auth.models import User
 from django.urls import reverse
 from unittest.mock import patch
+
+
 
 class TestCustomUserViewSet(TransactionTestCase):
     reset_sequences = True
@@ -455,6 +457,36 @@ class TournamentCreateAPIViewTest(TransactionTestCase):
         self.assertIn("player1", usernames)
         self.assertIn("player2", usernames)
         
+    @tag("continua")
+    def test_create_tournament_with_ranking_list(self):
+        """Debe asignar rankingList correctamente al crear el torneo"""
+
+        # Crear instancias válidas de RankingSystemClass
+        r1 = RankingSystemClass.objects.create(value=RankingSystem.BUCHHOLZ)
+        r2 = RankingSystemClass.objects.create(value=RankingSystem.WINS)
+
+        data = {
+            "name": "Torneo con ranking list",
+            "tournament_type": TournamentType.ROUNDROBIN,
+            "board_type": TournamentBoardType.OTB,
+            "win_points": 1.0,
+            "draw_points": 0.5,
+            "lose_points": 0.0,
+            "tournament_speed": "ra",
+            "rankingList": [r1.pk, r2.pk],
+            "players": ""
+        }
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(self.url, data, format='json')
+
+        #print("Response data:", response.data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        tournament = Tournament.objects.get(id=response.data["id"])
+        self.assertEqual(set(tournament.rankingList.all()), {r1, r2})
+
+        
         
         
         
@@ -546,8 +578,8 @@ class continuaAPITest(TransactionTestCase):
             board_type=TournamentBoardType.LICHESS
         )
 
-        white = Player.objects.create(lichess_username="superGM")
-        black = Player.objects.create(name="Backup Name")
+        white = Player.objects.create(name="Jugador Blanco", lichess_username="superGM")
+        black = Player.objects.create(name="Jugador Negro", lichess_username="anotherGM")
 
         rnd = Round.objects.create(tournament=tournament, name="Round 1")
         Game.objects.create(round=rnd, white=white, black=black, result="W")
@@ -557,5 +589,219 @@ class continuaAPITest(TransactionTestCase):
 
         game = response.data["0"]["games"]["1"]
         self.assertEqual(game["white_name"], "superGM")
-        self.assertEqual(game["black_name"], "Backup Name")
+        self.assertEqual(game["black_name"], "anotherGM")
         self.assertEqual(game["result"], "W")
+        
+        
+class GetPlayersAPIViewTest(TransactionTestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.url = '/api/v1/get_players/'
+
+    @tag("continua")
+    def test_tournament_not_found(self):
+        """Debe devolver 404 si el torneo no existe"""
+        response = self.client.get(f"{self.url}9999/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertFalse(response.data["result"])
+        self.assertIn("not found", response.data["message"])
+
+
+class UpdateLichessGameAPIViewTest(TransactionTestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.url = "/api/v1/update_lichess_game/"
+
+    @tag("continua")
+    def test_game_does_not_exist(self):
+        """Debe devolver 404 si el game_id no corresponde a un juego existente"""
+        data = {"game_id": 999, "lichess_game_id": "abcd1234"}
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertFalse(response.data["result"])
+        self.assertIn("Game does not exist", response.data["message"])
+
+    @tag("continua")
+    def test_game_is_finished_blocked(self):
+        """Debe devolver 400 si el juego está terminado y no se puede editar"""
+        
+        white = Player.objects.create(name="Player 1")
+        black = Player.objects.create(name="Player 2")
+
+        tournament = Tournament.objects.create(name="Tournament 1", administrativeUser=None)
+        round_obj = Round.objects.create(name="Round 1", tournament=tournament)
+
+        game = Game.objects.create(
+            white=white,
+            black=black,
+            round=round_obj,
+            result="W",
+            finished=True
+        )
+
+        data = {"game_id": game.id, "lichess_game_id": "abcd1234"}
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(response.data["result"])
+        self.assertIn("Game is blocked", response.data["message"])
+
+
+
+
+class UpdateOTBGameAPIViewTest(TransactionTestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.url = "/api/v1/update_otb_game/"
+
+    @tag("continua")
+    def test_game_does_not_exist_otb(self):
+        """Debe devolver 404 si el game_id no corresponde a un juego existente"""
+        data = {"game_id": 999, "otb_result": "w", "email": "test@example.com"}
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertFalse(response.data["result"])
+        self.assertIn("Game does not exist", response.data["message"])
+
+    @tag("continua")
+    def test_game_is_finished_otb(self):
+        """Debe devolver 400 si el juego ya está terminado"""
+        white = Player.objects.create(name="Player 1", email="white@example.com")
+        black = Player.objects.create(name="Player 2", email="black@example.com")
+        tournament = Tournament.objects.create(name="Torneo 1", administrativeUser=None)
+        round_obj = Round.objects.create(name="Round 1", tournament=tournament)
+
+        game = Game.objects.create(
+            white=white,
+            black=black,
+            round=round_obj,
+            result="W",
+            finished=True
+        )
+
+        data = {"game_id": game.id, "otb_result": "b", "email": black.email}
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(response.data["result"])
+        self.assertIn("Game is blocked", response.data["message"])
+
+    @tag("continua")
+    def test_invalid_result_value_otb(self):
+        """Debe devolver 400 si el otb_result es inválido"""
+        white = Player.objects.create(name="Player 1", email="white@example.com")
+        black = Player.objects.create(name="Player 2", email="black@example.com")
+        tournament = Tournament.objects.create(name="Torneo 1", administrativeUser=None)
+        round_obj = Round.objects.create(name="Round 1", tournament=tournament)
+
+        game = Game.objects.create(
+            white=white,
+            black=black,
+            round=round_obj,
+            finished=False
+        )
+
+        data = {"game_id": game.id, "otb_result": "x", "email": white.email}
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(response.data["result"])
+        self.assertIn("Invalid result value", response.data["message"])
+
+    @tag("continua")
+    def test_invalid_email_otb(self):
+        """Debe devolver 400 si el email no coincide con ningún jugador"""
+        white = Player.objects.create(name="Player 1", email="white@example.com")
+        black = Player.objects.create(name="Player 2", email="black@example.com")
+        tournament = Tournament.objects.create(name="Torneo 1", administrativeUser=None)
+        round_obj = Round.objects.create(name="Round 1", tournament=tournament)
+
+        game = Game.objects.create(
+            white=white,
+            black=black,
+            round=round_obj,
+            finished=False
+        )
+
+        data = {"game_id": game.id, "otb_result": "w", "email": "intruso@example.com"}
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(response.data["result"])
+        self.assertIn("Email does not match", response.data["message"])
+
+    @tag("continua")
+    def test_draw_result_normalization_otb(self):
+        """Debe actualizar correctamente un empate ('d' → '=')"""
+        white = Player.objects.create(name="Player 1", email="white@example.com")
+        black = Player.objects.create(name="Player 2", email="black@example.com")
+        tournament = Tournament.objects.create(name="Torneo 1", administrativeUser=None)
+        round_obj = Round.objects.create(name="Round 1", tournament=tournament)
+
+        game = Game.objects.create(
+            white=white,
+            black=black,
+            round=round_obj,
+            finished=False
+        )
+
+        data = {"game_id": game.id, "otb_result": "d", "email": white.email}
+        response = self.client.post(self.url, data)
+
+        game.refresh_from_db()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["result"])
+        self.assertEqual(game.result, Scores.DRAW.value)  # Debe ser "="
+        self.assertTrue(game.finished)
+        
+        
+        
+class AdminUpdateGameAPIViewTest(TransactionTestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username="admin", password="admin123")
+        self.client.force_authenticate(user=self.user)
+        self.url = "/api/v1/admin_update_game/"
+
+    @tag("continua")
+    def test_game_does_not_exist_admin(self):
+        """Debe devolver 404 si el game_id no corresponde a un juego existente"""
+        data = {"game_id": 999, "otb_result": "w"}
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertFalse(response.data["result"])
+        self.assertIn("Game does not exist", response.data["message"])
+
+    @tag("continua")
+    def test_invalid_result_value_admin(self):
+        """Debe devolver 400 si el otb_result es inválido"""
+        white = Player.objects.create(name="Player 1")
+        black = Player.objects.create(name="Player 2")
+        tournament = Tournament.objects.create(name="Torneo Admin", administrativeUser=self.user)
+        round_obj = Round.objects.create(name="Ronda 1", tournament=tournament)
+        game = Game.objects.create(white=white, black=black, round=round_obj)
+
+        data = {"game_id": game.id, "otb_result": "x"}
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(response.data["result"])
+        self.assertIn("Invalid result value", response.data["message"])
+
+    @tag("continua")
+    def test_draw_result_normalization_admin(self):
+        """Debe actualizar correctamente un empate ('d' → '=')"""
+        white = Player.objects.create(name="Player 1")
+        black = Player.objects.create(name="Player 2")
+        tournament = Tournament.objects.create(name="Torneo Admin", administrativeUser=self.user)
+        round_obj = Round.objects.create(name="Ronda 1", tournament=tournament)
+        game = Game.objects.create(white=white, black=black, round=round_obj, finished=False)
+
+        data = {"game_id": game.id, "otb_result": "d"}
+        response = self.client.post(self.url, data)
+
+        game.refresh_from_db()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["result"])
+        self.assertEqual(game.result, Scores.DRAW.value)  # "="
+        self.assertTrue(game.finished)
