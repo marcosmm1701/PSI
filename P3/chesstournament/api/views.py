@@ -1,8 +1,8 @@
-from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 from chess_models.models import Tournament
-from .serializers import TournamentSerializer, GameSerializer, PlayerSerializer, RefereeSerializer, RoundSerializer
+from .serializers import TournamentSerializer, GameSerializer
+from .serializers import PlayerSerializer, RefereeSerializer, RoundSerializer
 from djoser.views import UserViewSet
 from rest_framework.response import Response
 from rest_framework import status
@@ -21,12 +21,13 @@ from chess_models.models import Round
 from chess_models.models import Referee
 from chess_models.models import LichessAPIError
 from chess_models.models import Scores
-from rest_framework.exceptions import PermissionDenied
+
 
 class CustomPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
+
 
 class TournamentViewSet(viewsets.ModelViewSet):
     queryset = Tournament.objects.all().order_by('-start_date', '-id')
@@ -41,12 +42,11 @@ class TournamentViewSet(viewsets.ModelViewSet):
 
 class CustomUserViewSet(UserViewSet):
     def create(self, request, *args, **kwargs):
-        return Response({"result": False, "message": "User creation not allowed via API"},
+        return Response({"result": False,
+                         "message": "User creation not allowed via API"},
                         status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-        
-        
-        
+
 class GameViewSet(viewsets.ModelViewSet):
     queryset = Game.objects.all()
     serializer_class = GameSerializer
@@ -69,41 +69,48 @@ class GameViewSet(viewsets.ModelViewSet):
         if game.finished:
             if not request.user.is_authenticated:
                 return Response(
-                    {"result": False, "message": "Authentication required to update finished games"},
+                    {"result": False,
+                     "message": (
+                         "Authentication required to update finished games")
+                     },
                     status=status.HTTP_403_FORBIDDEN
                 )
 
         partial = kwargs.pop('partial', False)
-        serializer = self.get_serializer(game, data=request.data, partial=partial)
+        serializer = self.get_serializer(game,
+                                         data=request.data,
+                                         partial=partial)
         serializer.is_valid(raise_exception=True)
-        
+
         self.perform_update(serializer)
 
         game.finished = True
         game.save()
 
         return Response(serializer.data)
-    
-    
+
+
 class RefereeViewSet(viewsets.ModelViewSet):
     queryset = Referee.objects.all()
     serializer_class = RefereeSerializer
-    permission_classes = [AllowAny]  # Puedes cambiar esto si necesitas protección
+    permission_classes = [AllowAny]
+
 
 class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
     permission_classes = [AllowAny]
 
+
 class RoundViewSet(viewsets.ModelViewSet):
     queryset = Round.objects.all()
     serializer_class = RoundSerializer
     permission_classes = [AllowAny]
-    
-    
+
+
 class CreateRoundAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def post(self, request):
         tournament_id = request.data.get('tournament_id')
         if tournament_id is None:
@@ -116,22 +123,23 @@ class CreateRoundAPIView(APIView):
         # Buscamos el torneo
         try:
             tournament = Tournament.objects.get(id=tournament_id)
-                
+
         except Tournament.DoesNotExist:
             return Response({
                 "result": False,
                 "message": f"Tournament with id {tournament_id} does not exist"
             }, status=status.HTTP_404_NOT_FOUND)
-            
-                
+
         if tournament.getPlayersCount() == 0:
             return Response({
                 "result": False,
-                "message": f"Tournament with id {tournament_id} has no players"
+                "message": (
+                    f"Tournament with id {tournament_id} has no players")
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Llamamos a tu función
         res = create_rounds(tournament, [])
+        res = res
         """
         if tournament.getRoundCount() == 0:
             return Response({
@@ -139,14 +147,15 @@ class CreateRoundAPIView(APIView):
                 "message": f"Tournament with id {tournament_id} has no rounds"
             }, status=status.HTTP_400_BAD_REQUEST)
         """
-        
+
         return Response({
                 "result": True,
-                "message": f"Rounds created successfully for tournament {tournament.name}"
+                "message": (
+                    f"Rounds created successfully"
+                    f"for tournament {tournament.name}")
             }, status=status.HTTP_201_CREATED)
-            
-        
-        
+
+
 class SearchTournamentsAPIView(APIView):
     permission_classes = []
     pagination_class = CustomPagination
@@ -166,8 +175,8 @@ class SearchTournamentsAPIView(APIView):
 
         serializer = TournamentSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    
+
+
 class TournamentCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -183,16 +192,19 @@ class TournamentCreateAPIView(APIView):
             # Creamos el torneo con los datos principales
             tournament = Tournament.objects.create(
                 name=name,
-                administrativeUser=request.user,  # Usa el usuario autenticado como administrador
-                only_administrative=request.data.get("only_administrative", False),
+                # Usa el usuario autenticado como administrador
+                administrativeUser=request.user,
+                only_administrative=request.data.get("only_administrative",
+                                                     False),
                 tournament_type=request.data.get("tournament_type"),
                 board_type=request.data.get("board_type"),
                 win_points=request.data.get("win_points", 1.0),
                 draw_points=request.data.get("draw_points", 0.5),
                 lose_points=request.data.get("lose_points", 0.0),
                 tournament_speed=request.data.get("tournament_speed"),
-                #timeControl=request.data.get("timeControl", "15+0"),
-                #number_of_rounds_for_swiss=request.data.get("number_of_rounds_for_swiss", 0),
+                # timeControl=request.data.get("timeControl", "15+0"),
+                # number_of_rounds_for_swiss=request.data.
+                # get("number_of_rounds_for_swiss", 0),
             )
 
             # Añadir rankingList si se proporciona
@@ -212,14 +224,16 @@ class TournamentCreateAPIView(APIView):
                             name=row["nombre"].strip('"'),
                             email=row["email"]
                         )
-                        TournamentPlayer.objects.create(tournament=tournament, player=player)
+                        TournamentPlayer.objects.create(tournament=tournament,
+                                                        player=player)
 
                 elif tournament.board_type == TournamentBoardType.LICHESS:
                     for row in reader:
                         player = Player.objects.create(
                             lichess_username=row["lichess_username"]
                         )
-                        TournamentPlayer.objects.create(tournament=tournament, player=player)
+                        TournamentPlayer.objects.create(tournament=tournament,
+                                                        player=player)
 
             # Crear las rondas automáticamente
             create_rounds(tournament, [])
@@ -232,18 +246,19 @@ class TournamentCreateAPIView(APIView):
                 "result": False,
                 "message": f"Error creating tournament: {str(e)}"
             }, status=status.HTTP_400_BAD_REQUEST)
-            
-            
+
+
 class GetRanking(APIView):
     permission_classes = []  # no requiere autenticación
-    
+
     def get(self, request, tournament_id):
         try:
             tournament = Tournament.objects.get(id=tournament_id)
         except Tournament.DoesNotExist:
             return Response({
                 "result": False,
-                "message": f"Error: Tournament with ID {tournament_id} not found."
+                "message": (
+                    f"Error: Tournament with ID {tournament_id} not found.")
             }, status=status.HTTP_404_NOT_FOUND)
 
         ranking_data = getRanking(tournament)
@@ -252,7 +267,8 @@ class GetRanking(APIView):
         for player, player_data in ranking_data.items():
             entry = {
                 "id": player.id,
-                "name": player.lichess_username if player.lichess_username else player.name,
+                "name": player.lichess_username
+                if player.lichess_username else player.name,
                 "score": player_data.get("PS", 0),
                 "rank": player_data.get("rank", 0)
             }
@@ -265,13 +281,11 @@ class GetRanking(APIView):
             result[player.id] = entry
 
         return Response(result, status=status.HTTP_200_OK)
-    
-    
-    
+
 
 class GetRoundResults(APIView):
     permission_classes = []
-    authentication_classes = [] #Disables authentication
+    authentication_classes = []  # Disables authentication
 
     def get(self, request, tournament_id):
         try:
@@ -287,7 +301,9 @@ class GetRoundResults(APIView):
 
         for round_index, rnd in enumerate(rounds):
             games = Game.objects.filter(round=rnd)
-            games = sorted(games, key=lambda g: getattr(g.white, "ranking", 0), reverse=True)
+            games = sorted(games,
+                           key=lambda g: getattr(g.white, "ranking", 0),
+                           reverse=True)
 
             games_dict = {}
 
@@ -319,7 +335,7 @@ class GetRoundResults(APIView):
 
         return Response(results, status=status.HTTP_200_OK)
 
-    
+
 class GetPlayers(APIView):
     permission_classes = []
 
@@ -332,11 +348,12 @@ class GetPlayers(APIView):
                 "message": f"Tournament with ID {tournament_id} not found."
             }, status=status.HTTP_404_NOT_FOUND)
 
-        players = Player.objects.filter(tournamentplayer__tournament=tournament)
+        t = tournament
+        players = Player.objects.filter(tournamentplayer__tournament=t)
         serializer = PlayerSerializer(players, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    
+
+
 class UpdateLichessGameAPIView(APIView):
     permission_classes = []
     authentication_classes = []
@@ -348,34 +365,37 @@ class UpdateLichessGameAPIView(APIView):
         try:
             game = Game.objects.get(id=game_id)
         except Game.DoesNotExist:
-            return Response({"result": False, "message": "Game does not exist"
+            return Response({"result": False,
+                             "message": "Game does not exist"
                              }, status=status.HTTP_404_NOT_FOUND)
 
         if game.finished:
-            return Response({"result": False, "message": "Game is blocked, only administrator can update it"
+            return Response({"result": False,
+                             "message": (
+                                 "Game is blocked, " +
+                                 "only administrator can update it"
+                                 )
                              }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            winner, white, black = game.get_lichess_game_result(lichess_game_id)
+            id = lichess_game_id
+            winner, white, black = game.get_lichess_game_result(id)
         except LichessAPIError as e:
             return Response({"result": False, "message": str(e)
                              }, status=status.HTTP_400_BAD_REQUEST)
-            
-        
 
-        
         game.result = winner.value  # 'w', 'b' o '='
         game.finished = True
         game.save()
-        
-        return Response({"result": True, "message": "Game result updated from Lichess"
-                        },status=status.HTTP_200_OK)
-                        
+
+        return Response({"result": True,
+                         "message": "Game result updated from Lichess"
+                         }, status=status.HTTP_200_OK)
+
 
 class UpdateOTBGameAPIView(APIView):
     permission_classes = []
     authentication_classes = []     # disables authentication
-
 
     def post(self, request):
         game_id = request.data.get('game_id')
@@ -385,37 +405,45 @@ class UpdateOTBGameAPIView(APIView):
         try:
             game = Game.objects.get(id=game_id)
         except Game.DoesNotExist:
-            return Response({"result": False, "message": "Game does not exist"
+            return Response({"result": False,
+                             "message": "Game does not exist"
                              }, status=status.HTTP_404_NOT_FOUND)
 
         if game.finished:
-            return Response({"result": False, "message": "Game is blocked, only administrator can update it"
+            return Response({"result": False,
+                             "message": (
+                                "Game is blocked, " +
+                                "only administrator can update it"
+                             )
                              }, status=status.HTTP_400_BAD_REQUEST)
 
         valid_result = otb_result in ['w', 'b', 'd']
         if not valid_result:
-            return Response({"result": False, "message": "Invalid result value"
+            return Response({"result": False,
+                             "message": "Invalid result value"
                              }, status=status.HTTP_400_BAD_REQUEST)
 
         # Verificamos si el email corresponde al jugador blanco o negro
-        valid_email = (game.white and game.white.email == email) or (game.black and game.black.email == email)
+        valid_email = ((game.white and game.white.email == email)
+                       or (game.black and game.black.email == email))
 
         if not valid_email:
-            return Response({"result": False, "message": "Email does not match any player in this game"
+            return Response({"result": False,
+                             "message": (
+                                 "Email does not match any player in this game"
+                             )
                              }, status=status.HTTP_400_BAD_REQUEST)
 
         # Normalizamos resultados: traducimos 'd' → '=' (empate)
         if otb_result == 'd':
             otb_result = Scores.DRAW.value
-            
-            
+
         game.result = otb_result
         game.finished = True
         game.save()
 
         return Response({"result": True, "message": "Game updated by player"
                          }, status=status.HTTP_200_OK)
-
 
 
 class AdminUpdateGameAPIView(APIView):
@@ -426,30 +454,34 @@ class AdminUpdateGameAPIView(APIView):
         otb_result = request.data.get('otb_result')
 
         try:
-            game = Game.objects.select_related('round__tournament').get(id=game_id)
+            game = Game.objects.select_related('round__tournament')
+            game = game.get(id=game_id)
         except Game.DoesNotExist:
             return Response({"result": False, "message": "Game does not exist"
                              }, status=status.HTTP_404_NOT_FOUND)
 
         tournament = game.round.tournament
         if tournament.administrativeUser != request.user:
-            return Response({"result": False, "message": "Only the user that create the tournament can update it"
+            return Response({"result": False,
+                             "message": (
+                                 "Only the user that create " +
+                                 "the tournament can update it"
+                             )
                              }, status=status.HTTP_403_FORBIDDEN)
 
         if otb_result not in ['w', 'b', 'd']:
             return Response({"result": False, "message": "Invalid result value"
                              }, status=status.HTTP_400_BAD_REQUEST)
 
-        
         # Normalizamos resultados: traducimos 'd' → '=' (empate)
         if otb_result == 'd':
             otb_result = Scores.DRAW.value
-            
+
         # Actualizamos el resultado de la partida
         game.result = otb_result
         game.finished = True
         game.save()
 
-        return Response({"result": True, "message": "Game updated by administrator"
+        return Response({"result": True,
+                         "message": "Game updated by administrator"
                          }, status=status.HTTP_200_OK)
-    

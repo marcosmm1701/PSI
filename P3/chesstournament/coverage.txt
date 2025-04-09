@@ -1,0 +1,62 @@
+(psi_P3) marcos1701@marcos1701-VirtualBox:~/Escritorio/Marcos.M/PSI/PSI/P3/chesstournament$ coverage erase
+coverage run --omit="*/*/test*"  \
+./manage.py test --tag=continua
+coverage report -m -i
+USANDO BASE DE DATOS LOCAL
+Found 137 test(s).
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+...................................................No hay jugadores en el torneo.
+....No hay jugadores en el torneo.
+................................Game ID or players not set.
+Game ID or players not set.
+Game ID or players not set.
+Game ID or players not set.
+...No hay jugadores en el torneo.
+.No hay jugadores en el torneo.
+.Error: El torneo no existe.
+.No hay jugadores en el torneo.
+.....Error al verificar el usuario de Lichess: Error simulado
+..Error al verificar el usuario de Lichess: Falla de red simulada
+.....................................
+----------------------------------------------------------------------
+Ran 137 tests in 254.847s
+
+OK
+Destroying test database for alias 'default'...
+Name                                                                                      Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------------------------
+api/__init__.py                                                                               0      0   100%
+api/apps.py                                                                                   4      0   100%
+api/migrations/__init__.py                                                                    0      0   100%
+api/serializers.py                                                                           28      0   100%
+api/tests/__init__.py                                                                         0      0   100%
+api/urls.py                                                                                  11      0   100%
+api/views.py                                                                                237      0   100%
+chess_models/__init__.py                                                                      0      0   100%
+chess_models/admin.py                                                                         9      0   100%
+chess_models/apps.py                                                                          4      0   100%
+chess_models/management/commands/constants.py                                                 6      0   100%
+chess_models/management/commands/populate.py                                                 94      6    94%   81-82, 134, 137-140
+chess_models/migrations/0001_initial.py                                                       8      0   100%
+chess_models/migrations/0002_remove_round_game_set_remove_tournament_round_set.py             4      0   100%
+chess_models/migrations/0003_alter_round_tournament.py                                        5      0   100%
+chess_models/migrations/0004_alter_game_round.py                                              5      0   100%
+chess_models/migrations/0005_alter_tournament_start_date.py                                   4      0   100%
+chess_models/migrations/0006_rename_administrariveuser_tournament_administrativeuser.py       4      0   100%
+chess_models/migrations/__init__.py                                                           0      0   100%
+chess_models/models/__init__.py                                                               6      0   100%
+chess_models/models/constants.py                                                             41      0   100%
+chess_models/models/game.py                                                                  77      0   100%
+chess_models/models/other_models.py                                                          12      0   100%
+chess_models/models/player.py                                                                67      0   100%
+chess_models/models/round.py                                                                 25      0   100%
+chess_models/models/tournament.py                                                           155      0   100%
+chess_models/tests/__init__.py                                                                0      0   100%
+chess_models/tests/constants.py                                                               2      0   100%
+chesstournament/__init__.py                                                                   0      0   100%
+chesstournament/settings.py                                                                  31      2    94%   112-113
+chesstournament/urls.py                                                                       5      0   100%
+manage.py                                                                                    12      2    83%   12-13
+-----------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                                       856     10    99%
