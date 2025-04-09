@@ -1,4 +1,5 @@
-#APUNTES examen: Un serializer se encarga de convertir modelos de Django en JSON (y viceversa).
+#  APUNTES examen: Un serializer se encarga de
+#  convertir modelos de Django en JSON (y viceversa).
 
 # api/serializers.py
 
@@ -7,6 +8,7 @@ from chess_models.models import Tournament, Round, Game, Player, Referee
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+
 
 class TournamentSerializer(serializers.ModelSerializer):
     class Meta:
