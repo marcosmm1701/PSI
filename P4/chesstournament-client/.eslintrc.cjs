@@ -2,6 +2,17 @@
 require("@rushstack/eslint-patch/modern-module-resolution");
 
 module.exports = {
+  
+  env: {
+    node: true,
+    browser: true,
+    es2021: true,
+  },
+
+  globals: {
+    Cypress: true,
+  },
+
   root: true,
   extends: [
     "plugin:vue/vue3-essential",
