@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'chess_models',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',      # Para permitir CORS
     'djoser',
     'api',
 ]
@@ -59,6 +60,14 @@ REST_FRAMEWORK = {
 
 }
 
+# CORS permite que Vue.js (en otro dominio) acceda a Django
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:5173',
+    'http://localhost:4173',
+]
+
+
 
 # Configuración de djoser
 DJOSER = {
@@ -69,6 +78,9 @@ DJOSER = {
 
 
 MIDDLEWARE = [
+    
+    'corsheaders.middleware.CorsMiddleware',
+       
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -77,6 +89,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'chesstournament.urls'
