@@ -210,7 +210,9 @@ class TournamentCreateAPIView(APIView):
             # Añadir rankingList si se proporciona
             ranking_list_ids = request.data.get("rankingList", [])
             if ranking_list_ids:
-                tournament.rankingList.set(ranking_list_ids)
+                for ranking_list_id in ranking_list_ids:
+                    tournament.addToRankingList(ranking_list_id)
+                #tournament.rankingList.set(ranking_list_ids)
 
             # Procesar CSV de jugadores si se incluye
             players_csv = request.data.get("players", "").strip()
@@ -222,7 +224,13 @@ class TournamentCreateAPIView(APIView):
                     for row in reader:
                         player = Player.objects.create(
                             name=row["nombre"].strip('"'),
-                            email=row["email"]
+                            email=row["email"],
+                            #ANADIDO NUEVO
+                            
+                            fide_rating_blitz=row.get("fide_rating_blitz", None),
+                            fide_rating_rapid=row.get("fide_rating_rapid", None),
+                            fide_rating_classical=row.get("fide_rating_classical", None)
+                            
                         )
                         TournamentPlayer.objects.create(tournament=tournament,
                                                         player=player)
@@ -370,6 +378,7 @@ class UpdateLichessGameAPIView(APIView):
                              }, status=status.HTTP_404_NOT_FOUND)
 
         if game.finished:
+
             return Response({"result": False,
                              "message": (
                                  "Game is blocked, " +

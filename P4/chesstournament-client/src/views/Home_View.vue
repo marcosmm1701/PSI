@@ -1,11 +1,12 @@
 <template>
   <div class="Welcome-message-User" v-if="!authStore.isAuthenticated">
-    <p>
+    <h2 class="welcome-title">Welcome to the Chess Tournament Database</h2>
+    <p class="welcome-text">
       Welcome to the Chess Tournament Database.
       This database features the unique ability for players to update the results of their games.
       To create tournaments, an administrative account is required. However, any player can enter the result of a game.
     </p>
-    <p>
+    <p class="welcome-text">
       You can use the search button to fund tournaments by name. For further information, please refer to the
       <router-link :to="`/FAQ/`">FAQ</router-link> section.
     </p>
@@ -93,20 +94,10 @@ const authStore = useAuthStore(); // Instancia del store de autenticación
 
 const tournaments = ref([]);
 const currentPage = ref(1);
-const pageSize = 5;
+const totalPages = ref(1);
 
 const searchQuery = ref('');
 const filteredTournaments = ref([]);
-
-// Paginación computada
-const totalPages = computed(() => {
-  return Math.ceil(tournaments.value.length / pageSize);
-});
-
-const paginatedTournaments = computed(() => {
-  const start = (currentPage.value - 1) * pageSize;
-  return tournaments.value.slice(start, start + pageSize);
-});
 
 // Función para formatear la fecha
 const formatDate = (datetimeString) => {
@@ -115,30 +106,36 @@ const formatDate = (datetimeString) => {
 
 const API_URL = import.meta.env.VITE_DJANGOURL;
 
-// Fetch inicial
-onMounted(async () => {
+
+async function fetchTournaments(page = 1) {
   try {
-    const torneos = await fetch(API_URL + 'tournaments/');  // Hacemos la petición a la API
-    const data = await torneos.json();                      // Convertimos la respuesta a JSON
-    tournaments.value = data.results || [];                 // Guardamos los torneos en la variable tournaments
-    console.log("TOURNAMENTS:", tournaments.value);                       // Mostramos los torneos en la consola
+    const response = await fetch(`${API_URL}tournaments/?page=${page}`);
+    const data = await response.json();
+    tournaments.value = data.results;
+    totalPages.value = Math.ceil(data.count / 10); // count viene del backend
+    currentPage.value = page;
   } catch (error) {
     console.error('Error fetching tournaments:', error);
   }
+}
+
+
+onMounted(() => {
+  fetchTournaments();
 });
 
-// Funciones de navegación
 function nextPage() {
   if (currentPage.value < totalPages.value) {
-    currentPage.value++;
+    fetchTournaments(currentPage.value + 1);
   }
 }
 
 function prevPage() {
   if (currentPage.value > 1) {
-    currentPage.value--;
+    fetchTournaments(currentPage.value - 1);
   }
 }
+
 
 // Búsqueda
 async function search() {
@@ -171,12 +168,23 @@ async function search() {
 
 .Welcome-message-User,
 .Welcome-message-Admin {
-  width: 100%;
-  height: 250px;
-  background-color: #f5f5f5;
-  padding: 40px 30px;
+  background: linear-gradient(to right, #e0f7fa, #e1f5fe);
+  padding: 2rem;
+  border-radius: 1rem;
   margin-bottom: 2rem;
-  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.welcome-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.welcome-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
 }
 
 
@@ -195,7 +203,7 @@ async function search() {
 .listado-torneos,
 .search-box {
   width: 100%;
-  height: 300px;
+  height: auto;
   flex: 1;
   min-width: 300px;
   /* Para evitar que se hagan demasiado pequeñas en pantallas pequeñas */
@@ -219,19 +227,62 @@ async function search() {
   border-radius: 8px;
   position: sticky;
   top: 20px;
+  overflow: auto;
   /* Para que quede fijo al hacer scroll */
 }
+
+.search-box input {
+  width: 80%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.search-box button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.search-box button:hover {
+  background-color: #125ea5;
+}
+
 
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
+  background-color: #d5f1fa;
+  color: #333;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+thead {
+  background-color: #1976d2;
+  color: white;
+  text-align: left;
 }
 
 th,
 td {
-  border: 1px solid #ccc;
-  padding: 0.5rem;
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+  background-color: #e3f2fd;
+  cursor: pointer;
 }
 
 .pagination {
@@ -248,6 +299,7 @@ input {
 button {
   padding: 0.4rem 0.8rem;
   cursor: pointer;
+  border-radius: 50px;
 }
 
 .create-tournament-button {

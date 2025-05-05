@@ -29,6 +29,13 @@
 
         <details>
             <summary>Pairings/Results</summary>
+            <div v-if="tournament?.board_type === 'OTB'" class="otb-banner">
+                <strong>OTB</strong>
+            </div>
+            <div v-if="tournament?.board_type === 'LIC'" class="lic-banner">
+                <strong>LICHESS</strong>
+            </div>
+
             <div class="explanation">
                 <p>
                     The abbreviations used in the "result" column are explained at the end of the page.
@@ -52,12 +59,43 @@
                             <td>{{ i }}</td>
                             <td>{{ game.white_name }}</td>
                             <td class="result-cell">
-                                <input v-model="game.result" placeholder="type gameID" />
-                                <button @click="submitResult(game)">📤</button>
+
+                                <span v-if="game.result != '*'">
+                                    {{ game.result }}</span>
+
+                                <div v-if="game.result === '*'">
+                                    <template v-if="tournament.board_type === 'LIC'">
+                                        <input v-model="game.lichessGameId" placeholder="Lichess game ID" />
+                                        <button @click="submitLichessResult(game)">📤</button>
+                                    </template>
+                                    <template v-if="tournament.board_type === 'OTB'">
+                                        <select v-model="game.newResult">
+                                            <option disabled value="">Select result</option>
+                                            <option value="w">1-0</option>
+                                            <option value="b">0-1</option>
+                                            <option value="d">½-½</option>
+                                        </select>
+                                        <button @click="submitOTBResult(game)">📤</button>
+                                    </template>
+                                </div>
+
+                                <div v-if="authStore.isAuthenticated">
+                                    <!-- Resultado ya asignado, pero eres admin -->
+                                    <label><strong>Result (Admin):</strong></label>
+                                    <select v-model="game.newResult">
+                                        <option disabled value="">Select result</option>
+                                        <option value="w">1-0</option>
+                                        <option value="b">0-1</option>
+                                        <option value="d">½-½</option>
+                                    </select>
+                                    <button @click="submitResultAdmin(game)">📤</button>
+                                </div>
                             </td>
+
                             <td>{{ game.black_name }}</td>
                         </tr>
                     </tbody>
+
                 </table>
             </div>
         </details>
@@ -67,16 +105,21 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute();
 const tournamentName = ref('');
 const tournament = ref({}); // Objeto para almacenar el torneo
 const rounds = ref([]); // Array para almacenar las rondas del torneo
 const standingsData = ref([]); // Array para almacenar los datos del ranking
+const authStore = useAuthStore()
+
 
 const API_URL = import.meta.env.VITE_DJANGOURL;
 
 onMounted(async () => {
+
+
 
     try {
 
@@ -141,6 +184,20 @@ onMounted(async () => {
 
         console.log("STANDINGS SORTED:", standingsData.value);
 
+
+        if (tournament.value.board_type
+            === "OTB") {
+            console.log("This is an OTB tournament.");
+        }
+        else if (tournament.value.board_type
+            === "LIC") {
+            console.log("This is an LICHESS tournament.");
+        }
+        else {
+            console.log("Unknown tournament type.");
+        }
+
+
     } catch (error) {
         console.error('Error fetching tournament:', error);
     }
@@ -148,14 +205,147 @@ onMounted(async () => {
 });
 
 
+
+async function submitLichessResult(game) {
+
+    // Comprobamos que se ha itroducido el ID de la partida de Lichess
+    if (!game.lichessGameId) {
+        alert("Please enter a Lichess game ID.");
+        return;
+    }
+
+    console.log("Game:", game);
+    
+    try {
+        const response = await fetch(API_URL + "update_lichess_game/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                game_id: game.id,
+                lichess_game_id: game.lichessGameId,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.result === true) {
+            alert("Lichess result fetched and game updated.");
+            game.result = game.newResult;
+            game.lichessGameId = ""; // limpiamos input
+        } else {
+            alert(data.message || "Failed to fetch Lichess result.");
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("An error occurred while submitting the Lichess game ID.");
+    }
+}
+
+
+
+
+async function submitOTBResult(game) {
+    const tournamentId = route.params.id; // Obtenemos el ID del torneo desde la URL
+
+    //Obtenemos los jugadores del torneo para la comprobacion de OTB
+    const playersResponse = await fetch(API_URL + "get_players/" + tournamentId);
+    const players = await playersResponse.json();
+    console.log("PLAYERS:", players);
+
+
+
+    const email = prompt("Please enter the email used to join this tournament:");
+    if (!email) {
+        alert("You must enter an email.");
+        return;
+    }
+
+    // Validamos el email
+    const emailBuscado = email.toLowerCase();
+    const existe = players.some(p => p.email === emailBuscado);
+    if (!existe) {
+        alert("Email does not match with any player in the game");
+        return;
+    }
+    console.log("Game ID:", game.id);
+    console.log("New Result:", game.newResult);
+    console.log("Email:", email);
+    console.log("Game:", game);
+    try {
+        const response = await fetch(API_URL + "update_otb_game/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                game_id: game.id,
+                otb_result: game.newResult,
+                email: email,
+            }),
+        });
+        console.log("Response:", response);
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Game updated successfully!");
+            game.result = game.newResult;
+            game.newResult = ""; // Reset select
+        } else {
+            alert(data.error || "Failed to update result. Something went wrong.");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("An error occurred while submitting the result.");
+    }
+}
+
+
+
+async function submitResultAdmin(game) {
+
+    console.log("Game ID:", game.id);
+    console.log("New Result:", game.newResult);
+    console.log("Game:", game);
+    console.log("Auth token:", authStore.token);
+
+    try {
+        const response = await fetch(API_URL + "admin_update_game/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Token ${authStore.token}`
+            },
+            body: JSON.stringify({
+                game_id: game.id,
+                otb_result: game.newResult,
+            }),
+        });
+        console.log("Response:", response);
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Game updated successfully!");
+            game.result = game.newResult;
+            game.newResult = ""; // Reset select
+        } else {
+            alert(data.error || "Failed to update result. Something went wrong.");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("An error occurred while submitting the result.");
+    }
+}
+
+
 function refreshPage() {
     window.location.reload();
 }
 
-function submitResult(game) {
-    console.log('GAME:', game);
-    console.log('RESULT:', game.result);
-}
 </script>
 
 <style scoped>
@@ -206,6 +396,18 @@ details summary {
     margin-top: 1rem;
     cursor: pointer;
 }
+
+.otb-banner,
+.lic-banner {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ffeeba;
+    text-align: center;
+}
+
 
 .explanation {
     margin-top: 1rem;
