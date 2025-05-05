@@ -16,8 +16,8 @@
             <label>
                 Tournament Type:
                 <select v-model="form.tournament_type" required>
-                    <option value="SWISS">Swiss</option>
-                    <option value="ROUND_ROBIN">Round Robin</option>
+                    <option value="SW">Swiss</option>
+                    <option value="SR">Round Robin</option>
                 </select>
             </label>
 
@@ -25,17 +25,17 @@
                 Board Type:
                 <select v-model="form.board_type" required>
                     <option value="OTB">OTB</option>
-                    <option value="LICHESS">Lichess</option>
+                    <option value="LIC">Lichess</option>
                 </select>
             </label>
 
             <label>
                 Tournament Speed:
                 <select v-model="form.tournament_speed" required>
-                    <option value="BULLET">Bullet</option>
-                    <option value="BLITZ">Blitz</option>
-                    <option value="RAPID">Rapid</option>
-                    <option value="CLASSICAL">Classical</option>
+                    <option value="BU">Bullet</option>
+                    <option value="BL">Blitz</option>
+                    <option value="RA">Rapid</option>
+                    <option value="CL">Classical</option>
                 </select>
             </label>
 
@@ -65,9 +65,9 @@
 
 
             <div class="points-section">
-                <label>Win Points: <input type="number" step="0.1" v-model.number="form.win_points" /></label>
-                <label>Draw Points: <input type="number" step="0.1" v-model.number="form.draw_points" /></label>
-                <label>Lose Points: <input type="number" step="0.1" v-model.number="form.lose_points" /></label>
+                <label>Win Points: <input type="number" step="0.5" v-model.number="form.win_points" /></label>
+                <label>Draw Points: <input type="number" step="0.5" v-model.number="form.draw_points" /></label>
+                <label>Lose Points: <input type="number" step="0.5" v-model.number="form.lose_points" /></label>
             </div>
 
             <label>
@@ -94,9 +94,9 @@ const router = useRouter()
 
 const form = ref({
     name: '',
-    tournament_type: 'SWISS',
+    tournament_type: 'SW',
     board_type: 'OTB',
-    tournament_speed: 'RAPID',
+    tournament_speed: 'RA',
     only_administrative: false,
     win_points: 1.0,
     draw_points: 0.5,
@@ -140,12 +140,17 @@ async function handleSubmit() {
     successMsg.value = ''
     loading.value = true
 
+    console.log('Form data:', form.value)
+    console.log("Auth token:", authStore.token)
+
+
+
     try {
-        const res = await fetch(API_URL + 'createtournament/', {
+        const res = await fetch(API_URL + 'tournament_create/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${authStore.token}`
+                Authorization: `Token ${authStore.token}`
             },
             body: JSON.stringify({ ...form.value })
         })
@@ -165,6 +170,7 @@ async function handleSubmit() {
     } finally {
         loading.value = false
     }
+        
 }
 </script>
 

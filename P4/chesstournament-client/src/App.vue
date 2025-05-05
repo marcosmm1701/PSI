@@ -32,89 +32,98 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <style scoped>
-  /* scoped: Estilos específicos para este componente */
+/* scoped: Estilos específicos para este componente */
 
-  .app-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    /* asegura que el contenedor tenga al menos la altura de la pantalla */
-    min-width: 120vh; /* ESTO ME ACABA DE SALVAAAR LA VIDAAAA*/
+.app-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* asegura que el contenedor tenga al menos la altura de la pantalla */
+  min-width: 120vh;
+  /* ESTO ME ACABA DE SALVAAAR LA VIDAAAA*/
 
-  }
+}
 
-  /* Barra de navegación horizontal */
-  .navbar {
-    width: 100%;
-    /* Ocupa el 100% del ancho disponible */
-    height: 80px;
-    /* Altura de la barra de navegación */
-    z-index: 1000; 
-    /* Asegura que la barra de navegación esté por encima de otros elementos */
-    background-color: #2c3e50;
-    /* Color de fondo azul oscuro */
-    padding: 16px 32px;
-    /* Espaciado interno (tamaño objeto): 16px arriba/abajo, 32px izquierda/derecha */
-    position: fixed;
-    /* Posicionamiento fijo en la ventana */
-    top: 0;
-    /* Pegado al borde superior */
-    left: 0;
-    /* Pegado al borde izquierdo */
-    display: flex;
-    /* Usa el modelo Flexbox para disposición */
-    align-items: center;
-    /* Centra verticalmente los elementos hijos */
-    color: white;
-    /* Color de texto blanco */
-  }
+/* Barra de navegación horizontal */
+.navbar {
+  width: 100%;
+  /* Ocupa el 100% del ancho disponible */
+  height: 80px;
+  /* Altura de la barra de navegación */
+  z-index: 1000;
+  /* Asegura que la barra de navegación esté por encima de otros elementos */
+  background-color: #2c3e50;
+  /* Color de fondo azul oscuro */
+  padding: 16px 32px;
+  /* Espaciado interno (tamaño objeto): 16px arriba/abajo, 32px izquierda/derecha */
+  position: fixed;
+  /* Posicionamiento fijo en la ventana */
+  top: 0;
+  /* Pegado al borde superior */
+  left: 0;
+  /* Pegado al borde izquierdo */
+  display: flex;
+  /* Usa el modelo Flexbox para disposición */
+  align-items: center;
+  /* Centra verticalmente los elementos hijos */
+  color: white;
+  /* Color de texto blanco */
+}
 
 
-  .navbar-brand {
-    font-size: 1.5rem;
-    font-weight: bold;
-    white-space: nowrap;
-  }
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
 
-  .navbar-links {
-    display: flex;
-    gap: 1.5rem;
-    margin-right: auto;
-    /* Empuja los enlaces a la izquierda */
-  }
+.navbar-links {
+  display: flex;
+  gap: 1.5rem;
+  margin-right: auto;
+  /* Empuja los enlaces a la izquierda */
+}
 
-  .navbar-links a {
-    color: white;
-    text-decoration: none;
-  }
+.navbar-links a {
+  color: white;
+  text-decoration: none;
+}
 
-  .navbar-links a:hover {
-    text-decoration: underline;
-  }
+.navbar-links a:hover {
+  text-decoration: underline;
+}
 
-  .main-content {
-    flex: 1;
-    width: 100%;
-    margin-top: 80px;
-    /* espacio para la navbar fija */
-    padding: 1rem;
-    padding-bottom: 100px;
-    /* espacio para que no se solape con el footer */
-  }
+.main-content {
+  flex: 1;
+  width: 100%;
+  margin-top: 80px;
+  /* espacio para la navbar fija */
+  padding: 1rem;
+  padding-bottom: 100px;
+  /* espacio para que no se solape con el footer */
+  /*
+  background-image: url('@/assets/Background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  margin: 0;
+  font-family: sans-serif;*/
+}
 
-  .footer {
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 1rem;
-    background-color: #f8f9fa;
-    border-top: 1px solid #ddd;
-    z-index: 1000;
-  }
+.footer {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-top: 1px solid #ddd;
+  z-index: 1000;
+}
 </style>
