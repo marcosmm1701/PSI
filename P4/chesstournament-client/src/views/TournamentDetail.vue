@@ -7,7 +7,7 @@
         <!-- Acordeones -->
         <details>
 
-            <!-- Contenido claseificación-->
+            <!-- Contenido de la clasificación-->
             <summary>Standing</summary>
             <table>
                 <thead>

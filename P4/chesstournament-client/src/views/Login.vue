@@ -50,7 +50,7 @@ const authStore = useAuthStore()    // Instancia del store de autenticación
 
 
 const API_URL = import.meta.env.VITE_DJANGOURL; // Obtenemos la URL del backend desde las variables de entorno
-//console.log("API_URL:", API_URL);
+// console.log("API_URL:", API_URL); 
 
 const handleLogin = async () => {
     try {
