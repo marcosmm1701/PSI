@@ -26,7 +26,7 @@
     <router-link to="/createTournament">
       <button class="create-tournament-button" data-cy=create-Tournament-button>Create Tournament</button>
     </router-link>
-  </div>
+  </div> 
 
   <!--Seccion de Torneos-->
   <div class="tournament-section">

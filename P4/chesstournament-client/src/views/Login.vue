@@ -4,7 +4,7 @@
         <h2 class="login-tittle">Login</h2>
 
         <!-- Formulario para hacer login. -->
-        <form @submit.prevent="handleLogin">    <!-- Cuando escucha el evento submit, se llama a la función handleLogin -->
+        <form @submit.prevent="handleLogin">   <!-- Cuando escucha el evento submit, se llama a la función handleLogin -->
             <div class="input-group">
                 <input
                     id="username"
@@ -13,8 +13,8 @@
                     placeholder="Username"
                     data-cy="username"
                     class="login-input"
-                />
-            </div>
+                /> 
+            </div> 
 
             <div class="input-group">
                 <input
