@@ -10,12 +10,13 @@
         <form v-else @submit.prevent="handleSubmit" class="form-box">
             <label>
                 Name:
-                <input v-model="form.name" required placeholder="Introduzca el nombre del torneo" />
+                <input v-model="form.name" data-cy="name-cypress-test" required
+                    placeholder="Introduzca el nombre del torneo" />
             </label>
 
             <label>
                 Tournament Type:
-                <select v-model="form.tournament_type" required>
+                <select v-model="form.tournament_type" required data-cy="single_round_robin-cypress-test">
                     <option value="SW">Swiss</option>
                     <option value="SR">Round Robin</option>
                 </select>
@@ -23,7 +24,7 @@
 
             <label>
                 Board Type:
-                <select v-model="form.board_type" required>
+                <select v-model="form.board_type" required data-cy=boardtype-cypress-test>
                     <option value="OTB">OTB</option>
                     <option value="LIC">Lichess</option>
                 </select>
@@ -31,7 +32,7 @@
 
             <label>
                 Tournament Speed:
-                <select v-model="form.tournament_speed" required>
+                <select v-model="form.tournament_speed" required data-cy=tournament_speed-cypress-test>
                     <option value="BU">Bullet</option>
                     <option value="BL">Blitz</option>
                     <option value="RA">Rapid</option>
@@ -45,9 +46,10 @@
                     <summary>Click to select ranking systems</summary>
                     <div class="ranking-checkboxes">
                         <label v-for="system in allRankingSystems" :key="system.value">
-                            <input type="checkbox" :value="system.value"
-                                :checked="form.rankingList.includes(system.value)"
+                            <input type="checkbox" :id="`ranking-option-${system.value.toLowerCase()}`"
+                                :value="system.value" :checked="form.rankingList.includes(system.value)"
                                 @change="handleRankingChange(system.value, $event)" />
+
                             {{ system.label }}
                             <span v-if="form.rankingList.includes(system.value)">
                                 ({{ form.rankingList.indexOf(system.value) + 1 }})
@@ -60,7 +62,8 @@
 
             <div class="checkbox-row">
                 <label for="only_administrative">Only Administrative:</label>
-                <input id="only_administrative" type="checkbox" v-model="form.only_administrative" />
+                <input id="only_administrative" type="checkbox" v-model="form.only_administrative"
+                    data-cy="only_administrative-cypress-test" />
             </div>
 
 
@@ -72,7 +75,7 @@
 
             <label>
                 Players CSV:
-                <textarea v-model="form.players" placeholder="Add CSV content here..."></textarea>
+                <textarea v-model="form.players" id="input_9" placeholder="Add CSV content here..."></textarea>
             </label>
 
             <button type="submit" :disabled="loading">Create Tournament</button>
@@ -161,16 +164,17 @@ async function handleSubmit() {
             throw new Error(data.message || 'Tournament creation failed.')
         }
 
+
         successMsg.value = 'Tournament created successfully!'
         setTimeout(() => {
-            router.push('/')
+            router.push('/tournamentdetail/' + data.id)
         }, 2000)
     } catch (err) {
         errorMsg.value = err.message
     } finally {
         loading.value = false
     }
-        
+
 }
 </script>
 
@@ -281,10 +285,9 @@ button:hover {
 }
 
 .checkbox-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
 }
-
 </style>

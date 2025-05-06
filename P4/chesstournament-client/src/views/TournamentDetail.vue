@@ -69,13 +69,13 @@
                                         <button @click="submitLichessResult(game)">📤</button>
                                     </template>
                                     <template v-if="tournament.board_type === 'OTB'">
-                                        <select v-model="game.newResult">
+                                        <select v-model="game.newResult" :data-cy="`select-${index + 1}-${i+1}`">
                                             <option disabled value="">Select result</option>
                                             <option value="w">1-0</option>
                                             <option value="b">0-1</option>
                                             <option value="d">½-½</option>
                                         </select>
-                                        <button @click="submitOTBResult(game)">📤</button>
+                                        <button @click="submitOTBResult(game)" :data-cy="`button-${index + 1}-${i}`">📤</button>
                                     </template>
                                 </div>
 
