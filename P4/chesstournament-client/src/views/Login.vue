@@ -49,7 +49,7 @@ const router = useRouter();         // Instancia del router para redirigir despu
 const authStore = useAuthStore()    // Instancia del store de autenticación
 
 
-const API_URL = import.meta.env.VITE_DJANGOURL;  // Obtenemos la URL del backend desde las variables de entorno
+const API_URL = import.meta.env.VITE_DJANGOURL; // Obtenemos la URL del backend desde las variables de entorno
 //console.log("API_URL:", API_URL);
 
 const handleLogin = async () => {
