@@ -12,7 +12,7 @@
     </p>
   </div>
 
-  <div class="Welcome-message-Admin" v-if="authStore.isAuthenticated">
+  <div class="Welcome-message-Admin" data-cy="admin-log" v-if="authStore.isAuthenticated">
     <p>
       Hello, you are logged in as an administrator. Remember, with great prowe comes great responsibility.
     </p>
@@ -24,7 +24,7 @@
       tournaments, select the desired tournament.
     </p>
     <router-link to="/createTournament">
-      <button class="create-tournament-button">Create Tournament</button>
+      <button class="create-tournament-button" data-cy=create-Tournament-button>Create Tournament</button>
     </router-link>
   </div>
 
@@ -42,7 +42,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="t in tournaments" :key="t.id">
+          <tr v-for="t in tournaments" :key="t.id" :data-cy="`${t.name}`">
             <td>
               <router-link :to="`/tournamentdetail/${t.id}`">{{ t.name }}</router-link>
             </td>
@@ -52,16 +52,16 @@
         </tbody>
       </table>
       <div class="pagination">
-        <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+        <button @click="prevPage" :disabled="currentPage === 1" data-cy="previous-button">Previous</button>
         <!--<span>Page {{ currentPage }} of {{ totalPages }}</span>-->
-        <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+        <button @click="nextPage" :disabled="currentPage === totalPages" data-cy="next-button">Next</button>
       </div>
     </div>
 
     <!-- Búsqueda -->
     <div class="search-box">
-      <input v-model="searchQuery" placeholder="Search..." />
-      <button @click="search">Search</button>
+      <input v-model="searchQuery" data-cy="input-search" placeholder="Search..." />
+      <button @click="search" data-cy=submit-search>Search</button>
       <table v-if="filteredTournaments.length">
         <thead>
           <tr>
@@ -70,7 +70,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="t in filteredTournaments" :key="t.id">
+          <tr v-for="t in filteredTournaments" :key="t.id" :data-cy="`search-${t.name}`">
             <td><router-link :to="`/tournamentdetail/${t.id}`">{{ t.name }}</router-link></td>
             <td>{{ formatDate(t.start_date) }}</td>
             <!-- Hemos hecho la funcion formatDate para que no de muestre la hora -->

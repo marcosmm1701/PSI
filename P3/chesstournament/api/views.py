@@ -24,7 +24,7 @@ from chess_models.models import Scores
 
 
 class CustomPagination(PageNumberPagination):
-    page_size = 10
+    page_size = 5
     page_size_query_param = 'page_size'
     max_page_size = 100
 
@@ -223,13 +223,14 @@ class TournamentCreateAPIView(APIView):
                 if tournament.board_type == TournamentBoardType.OTB:
                     for row in reader:
                         player = Player.objects.create(
-                            name=row["nombre"].strip('"'),
-                            email=row["email"],
+                            # Limpiar y validar cada campo
+                            name = row.get("name", "").strip(),
+                            email = row.get("email", "").strip().lower(),
                             #ANADIDO NUEVO
                             
-                            fide_rating_blitz=row.get("fide_rating_blitz", None),
-                            fide_rating_rapid=row.get("fide_rating_rapid", None),
-                            fide_rating_classical=row.get("fide_rating_classical", None)
+                            fide_rating_blitz = self.clean_int_field(row.get("fide_rating_blitz")),
+                            fide_rating_rapid = self.clean_int_field(row.get("fide_rating_rapid")),
+                            fide_rating_classical = self.clean_int_field(row.get("fide_rating_classical"))
                             
                         )
                         TournamentPlayer.objects.create(tournament=tournament,
@@ -254,6 +255,14 @@ class TournamentCreateAPIView(APIView):
                 "result": False,
                 "message": f"Error creating tournament: {str(e)}"
             }, status=status.HTTP_400_BAD_REQUEST)
+            
+            
+            
+    def clean_int_field(self, value):
+        if value is None:
+            return None
+        value = value.strip()
+        return int(value) if value.isdigit() else None
 
 
 class GetRanking(APIView):

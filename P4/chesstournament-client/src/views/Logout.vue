@@ -1,5 +1,6 @@
 <template>
-    <div class="logout-container">
+    <div class="logout-container" data-cy="logoutPage">
+      <h1>Log Out</h1>
       <h2>You have been logged out</h2>
       <p>Thank you for visiting. Come back soon!</p>
       <router-link to="/login">

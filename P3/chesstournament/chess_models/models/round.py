@@ -4,7 +4,7 @@ from django.utils import timezone
 
 class Round(models.Model):
     name = models.CharField(max_length=128)
-    tournament = models.ForeignKey("Tournament", on_delete=models.RESTRICT)
+    tournament = models.ForeignKey("Tournament", on_delete=models.CASCADE) #CAMBIADO DE RESTRICT A CASCADE
     start_date = models.DateTimeField(default=timezone.now, null=True)
     end_date = models.DateTimeField(null=True)
     finish = models.BooleanField(default=False)

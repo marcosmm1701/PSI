@@ -11,7 +11,7 @@
                     v-model="username"
                     type="text"
                     placeholder="Username"
-                    data-cy="login-username"
+                    data-cy="username"
                     class="login-input"
                 />
             </div>
@@ -22,7 +22,7 @@
                     v-model="password"
                     type="password"
                     placeholder="Password"
-                    data-cy="login-password"
+                    data-cy="password"
                     class="login-input"
                 />
             </div>
@@ -30,7 +30,7 @@
             <button type="submit" class="login-button" data-cy="login-button">Log in</button>
         </form>
         <!-- Cuando la variable errorMessage esté a true, se muestra el mensaje de {{ errorMesage }}-->
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        <p v-if="errorMessage" class="error-message" data-cy="error-message">{{ errorMessage }}</p>
     </div>
 
 </template>
@@ -70,7 +70,7 @@ const handleLogin = async () => {
 
         // Si la respuesta no es 200, lanzamos un error
         if (!response.ok) {
-            errorMessage.value = data.detail || "login failed";
+            errorMessage.value = data.detail || "Error: Invalid username or password";
             return;
         }
 
@@ -82,7 +82,7 @@ const handleLogin = async () => {
         // Redirigimos al home
         router.push('/')
     } catch (err) {
-        errorMessage.value = 'Error de red o servidor no disponible'
+        errorMessage.value = 'Error: Invalid username or password'
     }
 }
 
