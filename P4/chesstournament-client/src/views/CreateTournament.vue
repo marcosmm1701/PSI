@@ -80,7 +80,7 @@
 
             <button type="submit" :disabled="loading">Create Tournament</button>
 
-            <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
+            <p v-if="errorMsg" class="error-msg" data-cy="error-message">{{ errorMsg }}</p>
             <p v-if="successMsg" class="success-msg">{{ successMsg }}</p>
         </form>
     </div>
@@ -146,8 +146,6 @@ async function handleSubmit() {
     console.log('Form data:', form.value)
     console.log("Auth token:", authStore.token)
 
-
-
     try {
         const res = await fetch(API_URL + 'tournament_create/', {
             method: 'POST',
@@ -159,18 +157,20 @@ async function handleSubmit() {
         })
 
         const data = await res.json()
-
+        console.log('Response data TORNEOOOO:', data.message)
         if (!res.ok) {
-            throw new Error(data.message || 'Tournament creation failed.')
+            const errorMessage = data?.message ?? 'Tournament creation failed.'
+            throw new Error(errorMessage)
         }
 
 
         successMsg.value = 'Tournament created successfully!'
         setTimeout(() => {
             router.push('/tournamentdetail/' + data.id)
-        }, 2000)
+        }, 10000)
     } catch (err) {
-        errorMsg.value = err.message
+        errorMsg.value = err.message || 'Unexpected error.'
+        console.error('Tournament creation error:', err)
     } finally {
         loading.value = false
     }

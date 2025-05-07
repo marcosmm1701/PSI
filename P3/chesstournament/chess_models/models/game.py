@@ -156,7 +156,7 @@ def create_rounds(tournament, swissByes=[]):
     def emparejamiento_de_ronda(num_ronda, lista):
         """Función para crear los emparejamientos de una ronda"""
         round = Round.objects.create(
-            name=f"Round {num_ronda}",
+            name=f"round_{str(num_ronda).zfill(3)}",  # Formato round_001, round_002, etc.
             tournament=tournament)
 
         if num_ronda % 2 == 1:

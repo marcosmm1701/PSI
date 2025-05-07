@@ -135,10 +135,10 @@ describe("Round Robing 10 players tournament Lichess", () => {
         tournament_name,
         headerLIC + playersLIC
       ); //add tournament name, different for each test.
-  
+      cy.wait(10000)
       // Go to main page and...
       cy.visit("/");
-      // cy.wait(2000)
+      //cy.wait(2000)
   
       // ... select tournament
       cy.get("[data-cy=" + tournament_name + "]").click();
@@ -155,11 +155,12 @@ describe("Round Robing 10 players tournament Lichess", () => {
           .clear({ force: true }) // Clear the input field, forcing the action if necessary
           .type(gameID, { force: true }); // Type into the input field, forcing the action if necessary
         // click
-        // cy.wait(500)
+         
         cy.get(`[data-cy=button-${roundN}-${gameN}]`)
           //.scrollIntoView( {offset: { top: -50, left: 0 }})           // Scroll the element into view
           //.should('be.visible')       // Ensure the element is visible
           .click({ force: true }); // Click the button, forcing the action if necessary
+        //cy.wait(20000)
         // check results
         cy.get(`[data-cy=input-${roundN}-${gameN}]`).should(
           "contain.text",

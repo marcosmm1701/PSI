@@ -118,6 +118,8 @@ describe("Round Robing 10 players tournament OTB, admin modifies results", () =>
         cy.get(`[data-cy=button-${roundN}-${gameN}]`)
           // Click the button, forcing the action if necessary
           .click({ force: true });
+
+        cy.wait(3000)
         // check results
         cy.get(`[data-cy=input-${roundN}-${gameN}]`).should(
           "contain.text",
@@ -143,13 +145,16 @@ describe("Round Robing 10 players tournament OTB, admin modifies results", () =>
           .should("contain.text", black)
           .should("contain.text", wins);
       }); // end forEach
-  
+      
+      cy.wait(30000)
+
       // login
       cy.visit("/"); // login is lost at this point
       cy.login(Cypress.env("username"), Cypress.env("password"));
       // select tournament
       cy.get("[data-cy=tournament_SR]").click();
       // check extra column
+      cy.wait(500)
       cy.get("[data-cy=select-admin-1-1]").should("exist");
       // modify reults
       // select input widget and select game result
@@ -159,7 +164,7 @@ describe("Round Robing 10 players tournament OTB, admin modifies results", () =>
         .should("be.visible") // Ensure the element is visible
         .select("Black wins (0-1)", { force: true });
       // click
-      //cy.wait(500)
+      cy.wait(500)
       cy.get(`[data-cy=button-admin-1-1]`).click({ force: true });
   
       // check we have selected the right result
@@ -172,6 +177,7 @@ describe("Round Robing 10 players tournament OTB, admin modifies results", () =>
         .click({ force: true });
       // check ranking after modification
       rankings2.forEach((tuple, index) => {
+        cy.wait(500)
         const [name, points, black, wins] = tuple; // Destructure the tuple
         cy.get(`[data-cy=ranking-${index + 1}]`)
           .scrollIntoView() // Scroll the element into view

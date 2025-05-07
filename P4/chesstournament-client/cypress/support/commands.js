@@ -103,47 +103,34 @@ Cypress.Commands.add("delete_all_tournaments", () => {
     const python = Cypress.env("python");
     const manage = Cypress.env("manage");
 
-    var command =
-        "# delete all tournaments" +
-        "\n" +
-        "export _PYTHON=" +
-        python +
-        "\n" +
-        "export _MANAGE=" +
-        manage +
-        "\n" +
-        "# nothing to modify before this line\n" +
-        "\n" +
-        "cat <<EOF | $_PYTHON $_MANAGE shell\n" +
-        "from chess_models.models import Tournament\n" +
-        "# reset secuences to 1\n" +
-        "from django.db import connection\n" +
-        "from django.apps import apps\n" +
-        "\n" +
-        "def reset_sequence(app_name, model_name):\n" +
-        "    # Get the model class\n" +
-        "    Model = apps.get_model(app_name, model_name)\n" +
-        "    \n" +
-        "    # Get the table name and the primary key column\n" +
-        "    table_name = Model._meta.db_table\n" +
-        "    primary_key_column = Model._meta.pk.column\n" +
-        "    \n" +
-        "    with connection.cursor() as cursor:\n" +
-        "        # Get the name of the sequence associated with the primary key column\n" +
-        "        cursor.execute(f\"SELECT pg_get_serial_sequence('{table_name}', '{primary_key_column}');\")\n" +
-        "        sequence_name = cursor.fetchone()[0]\n" +
-        "        \n" +
-        "        if sequence_name:\n" +
-        '            print(f"Resetting sequence {sequence_name} for {table_name}.{primary_key_column}")\n' +
-        "            cursor.execute(f\"SELECT setval('{sequence_name}', 1, false) FROM {table_name};\")\n" +
-        "        else:\n" +
-        '            print(f"No sequence found for {table_name}.{primary_key_column}")\n' +
-        "reset_sequence('chess_models', 'Tournament')\n" +
-        "reset_sequence('chess_models', 'Player')\n" +
-        "reset_sequence('chess_models', 'Game')\n" +
-        "# FRST reset sequence then delete not the other way around\n" +
-        "Tournament.objects.all().delete()\n" +
-        "EOF\n";
+    const command = `${python} ${manage} shell -c "
+from chess_models.models import Tournament, Round, Game, Player
+from django.db import connection
+from django.apps import apps
+
+def reset_sequence(app_name, model_name):
+    Model = apps.get_model(app_name, model_name)
+    table_name = Model._meta.db_table
+    primary_key_column = Model._meta.pk.column
+    with connection.cursor() as cursor:
+        cursor.execute(f'SELECT pg_get_serial_sequence(\\'{table_name}\\', \\'{primary_key_column}\\');')
+        sequence_name = cursor.fetchone()[0]
+        if sequence_name:
+            print(f'Resetting sequence {sequence_name} for {table_name}.{primary_key_column}')
+            cursor.execute(f'SELECT setval(\\'{sequence_name}\\', 1, false);')
+        else:
+            print(f'No sequence found for {table_name}.{primary_key_column}')
+
+Game.objects.all().delete()
+Round.objects.all().delete()
+Tournament.objects.all().delete()
+Player.objects.all().delete()
+
+reset_sequence('chess_models', 'Tournament')
+reset_sequence('chess_models', 'Round')
+reset_sequence('chess_models', 'Game')
+reset_sequence('chess_models', 'Player')
+"`;
     // cy.log("COMMAND: " + command);
     cy.exec(command);
 });
@@ -318,31 +305,31 @@ Cypress.Commands.add("add_user", (username, password) => {
     const manage = Cypress.env("manage");
 
     var command =
-      "# create user\n" +
-      "export _PYTHON=" +
-      python +
-      "\n" +
-      "export _MANAGE=" +
-      manage +
-      "\n" +
-      "cat <<EOF | ${_PYTHON} ${_MANAGE} shell\n" +
-      "from django.contrib.auth import get_user_model\n" +
-      "User = get_user_model()\n" +
-      "user, created = User.objects.get_or_create(" +
-      "username='" +
-      username +
-      "');" +
-      "user.set_password('" +
-      password +
-      "');" +
-      "user.email = '" +
-      username +
-      "@gmail.com';" +
-      "user.save()\n" +
-      "EOF\n";
+        "# create user\n" +
+        "export _PYTHON=" +
+        python +
+        "\n" +
+        "export _MANAGE=" +
+        manage +
+        "\n" +
+        "cat <<EOF | ${_PYTHON} ${_MANAGE} shell\n" +
+        "from django.contrib.auth import get_user_model\n" +
+        "User = get_user_model()\n" +
+        "user, created = User.objects.get_or_create(" +
+        "username='" +
+        username +
+        "');" +
+        "user.set_password('" +
+        password +
+        "');" +
+        "user.email = '" +
+        username +
+        "@gmail.com';" +
+        "user.save()\n" +
+        "EOF\n";
     // cy.log("COMMAND: " + command)
     cy.exec(command);
-  });
+});
 
 //CODIGO CAMBIADO FIN
 //CODIGO CAMBIADO FIN

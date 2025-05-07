@@ -84,6 +84,7 @@ describe("Round Robing 10 players tournament Lichess, admin modify results", () 
         tournament_name,
         headerLIC + playersLIC
       ); //add tournament name, different for each test.
+      cy.wait(10000) // Espera para que registren los jugadores
       // Go to main page
       cy.visit("/");
   

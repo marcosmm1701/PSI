@@ -209,6 +209,7 @@ class TournamentCreateAPIView(APIView):
 
             # Añadir rankingList si se proporciona
             ranking_list_ids = request.data.get("rankingList", [])
+            print(f"ranking_list_ids: {ranking_list_ids}")
             if ranking_list_ids:
                 for ranking_list_id in ranking_list_ids:
                     tournament.addToRankingList(ranking_list_id)
@@ -217,20 +218,25 @@ class TournamentCreateAPIView(APIView):
             # Procesar CSV de jugadores si se incluye
             players_csv = request.data.get("players", "").strip()
             if players_csv:
-                players_io = io.StringIO(players_csv)
+                # Limpiar cada línea del CSV para quitar espacios innecesarios
+                lines = [line.strip() for line in players_csv.strip().splitlines() if line.strip()]
+                players_io = io.StringIO("\n".join(lines))
                 reader = csv.DictReader(players_io)
 
                 if tournament.board_type == TournamentBoardType.OTB:
                     for row in reader:
+                        # Limpiar cada campo de espacios en blanco
+                        cleaned_row = {k.strip(): v.strip() for k, v in row.items()}
+                        
                         player = Player.objects.create(
                             # Limpiar y validar cada campo
-                            name = row.get("name", "").strip(),
-                            email = row.get("email", "").strip().lower(),
+                            name = cleaned_row.get("name", "").strip(),
+                            email = cleaned_row.get("email", "").strip().lower(),
                             #ANADIDO NUEVO
                             
-                            fide_rating_blitz = self.clean_int_field(row.get("fide_rating_blitz")),
-                            fide_rating_rapid = self.clean_int_field(row.get("fide_rating_rapid")),
-                            fide_rating_classical = self.clean_int_field(row.get("fide_rating_classical"))
+                            fide_rating_blitz = self.clean_int_field(cleaned_row.get("fide_rating_blitz")),
+                            fide_rating_rapid = self.clean_int_field(cleaned_row.get("fide_rating_rapid")),
+                            fide_rating_classical = self.clean_int_field(cleaned_row.get("fide_rating_classical"))
                             
                         )
                         TournamentPlayer.objects.create(tournament=tournament,
@@ -238,9 +244,21 @@ class TournamentCreateAPIView(APIView):
 
                 elif tournament.board_type == TournamentBoardType.LICHESS:
                     for row in reader:
+                        # Limpiar cada campo de espacios en blanco
+                        cleaned_row = {k.strip(): v.strip() for k, v in row.items()}
+                        print(f"cleaned_row: {cleaned_row}")
                         player = Player.objects.create(
-                            lichess_username=row["lichess_username"]
+                            lichess_username=cleaned_row.get("lichess_username", "").strip()
                         )
+                        if(player.check_lichess_user_exists() == False):
+                            return Response({
+                                "result": False,
+                                "message": (
+                                    f"Error: can not add players to tournament"
+                                )
+                            }, status=status.HTTP_400_BAD_REQUEST)
+                            
+                        
                         TournamentPlayer.objects.create(tournament=tournament,
                                                         player=player)
 
@@ -318,9 +336,10 @@ class GetRoundResults(APIView):
 
         for round_index, rnd in enumerate(rounds):
             games = Game.objects.filter(round=rnd)
-            games = sorted(games,
-                           key=lambda g: getattr(g.white, "ranking", 0),
-                           reverse=True)
+            #games = sorted(games,
+                           #key=lambda g: getattr(g.white, "ranking", 0),
+                           #reverse=True)
+            games = games.order_by("id")
 
             games_dict = {}
 
@@ -428,6 +447,7 @@ class UpdateOTBGameAPIView(APIView):
                              }, status=status.HTTP_404_NOT_FOUND)
 
         if game.finished:
+            print("Game is finished")
             return Response({"result": False,
                              "message": (
                                 "Game is blocked, " +
@@ -437,15 +457,17 @@ class UpdateOTBGameAPIView(APIView):
 
         valid_result = otb_result in ['w', 'b', 'd']
         if not valid_result:
+            print("Unvalid result value")
             return Response({"result": False,
                              "message": "Invalid result value"
                              }, status=status.HTTP_400_BAD_REQUEST)
 
         # Verificamos si el email corresponde al jugador blanco o negro
-        valid_email = ((game.white and game.white.email == email)
-                       or (game.black and game.black.email == email))
+        valid_email = ((game.white and game.white.email.lower() == email.lower())
+                       or (game.black and game.black.email.lower() == email.lower()))
 
         if not valid_email:
+            print("Email does not match any player")
             return Response({"result": False,
                              "message": (
                                  "Email does not match any player in this game"

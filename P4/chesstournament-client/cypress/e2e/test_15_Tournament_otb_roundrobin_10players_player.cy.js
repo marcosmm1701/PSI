@@ -158,7 +158,9 @@ describe("Round Robing 10 players tournament OTB", () => {
           .scrollIntoView({ offset: { top: -200, left: 0 } })
           .should("be.visible") // Ensure the element is visible
           .select(result_to_select[result], { force: true });
-  
+        
+
+        //cy.wait(2000)
         // cypress does not handle javascript pop-ups
         // that is why we need to simulate a response
         // to the prompt widget BEFORE triggering it
@@ -170,17 +172,25 @@ describe("Round Robing 10 players tournament OTB", () => {
           cy.log(white + "@example.com");
           cy.stub(win, "prompt").returns(white + "@example.com");
         });
-  
+        
+        //cy.wait(2000)
+
+
         // click and send to server
         cy.get(`[data-cy=button-${roundN}-${gameN}]`)
           // Click the button, forcing the action if necessary
           .click({ force: true });
+
+
+        //cy.wait(2000)
         // check results
         let _result = result_to_input[result];
         cy.get(`[data-cy=input-${roundN}-${gameN}]`).should(
           "contain.text",
           `${_result}`
         );
+      
+
       }); // end forEach
       // select ranking piano
       cy.get("[data-cy=standing-accordion-button]")

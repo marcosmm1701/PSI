@@ -42,9 +42,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="t in tournaments" :key="t.id" :data-cy="`${t.name}`">
+          <tr v-for="t in tournaments" :key="t.id" >
             <td>
-              <router-link :to="`/tournamentdetail/${t.id}`">{{ t.name }}</router-link>
+              <router-link :to="`/tournamentdetail/${t.id}`" :data-cy="`${t.name}`">{{ t.name }}</router-link>
             </td>
             <td>{{ formatDate(t.start_date) }}</td>
             <!-- Hemos hecho la funcion formatDate para que no de muestre la hora -->

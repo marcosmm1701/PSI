@@ -1,6 +1,6 @@
 <template>
     <div class="tournament-detail">
-        <h2>Tournament: <em>{{ tournamentName }}</em></h2>
+        <h2 data-cy="tournament-title">Tournament: <em>{{ tournamentName }}</em></h2>
         <button @click="refreshPage" class="refresh-btn">Refresh Page</button>
         <p>Click the accordions below to expand/collapse the content.</p>
 
@@ -8,20 +8,25 @@
         <details>
 
             <!-- Contenido claseificación-->
-            <summary>Standing</summary>
+            <summary data-cy="standing-accordion-button">Standing</summary>
             <table>
                 <thead>
                     <tr>
                         <th>Rank</th>
                         <th>Username</th>
                         <th>Points</th>
+                        <th>Nº Wins</th>
+                        <th>Nº Black times</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(player, index) in standingsData" :key="index">
+                    <tr v-for="(player, index) in standingsData" :key="index"
+                        :data-cy="'ranking-' + (Number(index) + 1)">
                         <td>{{ player.rank }}</td>
                         <td>{{ player.name }}</td>
                         <td>{{ player.score }}</td>
+                        <td>{{ Number(player.WI).toFixed(2) }}</td>
+                        <td>{{ Number(player.BT).toFixed(2) }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -43,8 +48,8 @@
                     information.
                 </p>
             </div>
-            <div v-for="(round, index) in rounds" :key="index">
-                <h3>{{ round.round_name }}</h3>
+            <div v-for="(round, roundIndex) in rounds" :key="roundIndex">
+                <h3 :data-cy="'round_' + (Number(roundIndex) + 1)">{{ round.round_name }}</h3>
                 <table>
                     <thead>
                         <tr>
@@ -55,40 +60,56 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(game, i) in round.games" :key="i">
-                            <td>{{ i }}</td>
+                        <tr v-for="(game, i) in round.games" :key="i"
+                            :data-cy="'game_' + (Number(roundIndex) + 1) + '_' + (Number(i))">
+                            <td>
+                                {{ i }} <br />
+                                GAME: {{ 'game_' + (Number(roundIndex) + 1) + '_' + (Number(i)) }} <br />
+                                VALORES: {{ 'select-' + (Number(roundIndex) + 1) + '-' + (Number(i)) }}
+                            </td>
+
                             <td>{{ game.white_name }}</td>
                             <td class="result-cell">
 
-                                <span v-if="game.result != '*'">
-                                    {{ game.result }}</span>
+                                <span v-if="game.result != '*'"
+                                    :data-cy="'input-' + (Number(roundIndex) + 1) + '-' + i">
+                                    {{ getReadableResult(game.result) }}
+                                </span>
+
 
                                 <div v-if="game.result === '*'">
                                     <template v-if="tournament.board_type === 'LIC'">
-                                        <input v-model="game.lichessGameId" placeholder="Lichess game ID" />
-                                        <button @click="submitLichessResult(game)">📤</button>
+                                        <input v-model="game.lichessGameId" placeholder="Lichess game ID"
+                                            :data-cy="'input-' + (Number(roundIndex) + 1) + '-' + i" />
+                                        <button @click="submitLichessResult(game)"
+                                            :data-cy="'button-' + (Number(roundIndex) + 1) + '-' + i">📤</button>
                                     </template>
                                     <template v-if="tournament.board_type === 'OTB'">
-                                        <select v-model="game.newResult" :data-cy="`select-${index + 1}-${i+1}`">
+                                        <label><strong>Result:</strong></label>
+                                        <select v-model="game.newResult"
+                                            :data-cy="'select-' + (Number(roundIndex) + 1) + '-' + i">
                                             <option disabled value="">Select result</option>
-                                            <option value="w">1-0</option>
-                                            <option value="b">0-1</option>
-                                            <option value="d">½-½</option>
+                                            <option value="White wins (1-0)">White wins (1-0)</option>
+                                            <option value="Black wins (0-1)">Black wins (0-1)</option>
+                                            <option value="Draw (1/2-1/2)">Draw (1/2-1/2)</option>
                                         </select>
-                                        <button @click="submitOTBResult(game)" :data-cy="`button-${index + 1}-${i}`">📤</button>
+                                        <button @click="submitOTBResult(game)"
+                                            :data-cy="'button-' + (Number(roundIndex) + 1) + '-' + i">📤</button>
                                     </template>
                                 </div>
 
                                 <div v-if="authStore.isAuthenticated">
                                     <!-- Resultado ya asignado, pero eres admin -->
                                     <label><strong>Result (Admin):</strong></label>
-                                    <select v-model="game.newResult">
+                                    <select v-model="game.newResult"
+                                        :data-cy="'select-admin-' + (Number(roundIndex) + 1) + '-' + i">
                                         <option disabled value="">Select result</option>
-                                        <option value="w">1-0</option>
-                                        <option value="b">0-1</option>
-                                        <option value="d">½-½</option>
+                                        <option value="White wins (1-0)">White wins (1-0)</option>
+                                        <option value="Black wins (0-1)">Black wins (0-1)</option>
+                                        <option value="Draw (1/2-1/2)">Draw (1/2-1/2)</option>
                                     </select>
-                                    <button @click="submitResultAdmin(game)">📤</button>
+                                    <button @click="submitResultAdmin(game)"
+                                        :data-cy="'button-admin-' + (Number(roundIndex) + 1) + '-' + i">📤</button>
                                 </div>
                             </td>
 
@@ -104,15 +125,17 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth'
 
-const route = useRoute();
+const route = useRoute()
+const router = useRouter()
 const tournamentName = ref('');
 const tournament = ref({}); // Objeto para almacenar el torneo
 const rounds = ref([]); // Array para almacenar las rondas del torneo
 const standingsData = ref([]); // Array para almacenar los datos del ranking
 const authStore = useAuthStore()
+
 
 
 const API_URL = import.meta.env.VITE_DJANGOURL;
@@ -136,30 +159,7 @@ onMounted(async () => {
         console.log("TOURNAMENT:", tournament.value);
 
         tournamentName.value = tournament.value.name; // Guardamos el nombre del torneo
-
-
-        /*
-        // Obtenemos el torneo especificado en la URL desde la API
-        const response = await fetch(API_URL + "searchTournaments/", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                search_string: tournamentName.value
-            }),
-        });
-
-        if (!response.ok) {
-            console.error('Error fetching tournaments:', data);
-            return;
-        }
-
-        const data = await response.json();
-
-        tournament.value = data[0] || [];
-        */
-
+        console.log("TOURNAMENT NAME:", tournamentName.value);
 
 
         // Obtenemos las rondas del torneo con get_round_results, que nos devuelve las ronsas y las partidas del torneo
@@ -168,7 +168,7 @@ onMounted(async () => {
         const roundsresponse = await fetch(API_URL + "get_round_results/" + tournamentId);
         rounds.value = await roundsresponse.json();
         //console.log("ROUNDSDATA:", roundsresponse.value);
-        console.log("ROUNDS:", rounds);
+        console.log("ROUNDS:", rounds.value);
 
 
 
@@ -176,9 +176,10 @@ onMounted(async () => {
         const standingsresponse = await fetch(API_URL + "get_ranking/" + tournamentId);
         const standingsRaw = await standingsresponse.json();
 
+
         // Convertimos el objeto en array
         const standingsArray = Object.values(standingsRaw);
-
+        console.log("STANDINGS:", standingsArray);
         // Ordenamos el array por `rank`
         standingsData.value = standingsArray.sort((a, b) => a.rank - b.rank);
 
@@ -206,7 +207,26 @@ onMounted(async () => {
 
 
 
+function getReadableResult(result) {
+    switch (result) {
+        case "w":
+            return "White wins (1-0)";
+        case "b":
+            return "Black wins (0-1)";
+        case "d":
+            return "Draw (½-½)";
+        case "=":
+            return "Draw (½-½)";
+        default:
+            return result;
+    }
+}
+
+
+
+
 async function submitLichessResult(game) {
+    const tournamentId = route.params.id; // Obtenemos el ID del torneo desde la URL
 
     // Comprobamos que se ha itroducido el ID de la partida de Lichess
     if (!game.lichessGameId) {
@@ -215,7 +235,8 @@ async function submitLichessResult(game) {
     }
 
     console.log("Game:", game);
-    
+    console.log("Lichess Game ID:", game.lichessGameId);
+
     try {
         const response = await fetch(API_URL + "update_lichess_game/", {
             method: "POST",
@@ -230,9 +251,11 @@ async function submitLichessResult(game) {
 
         const data = await response.json();
 
+
+
         if (response.ok && data.result === true) {
             alert("Lichess result fetched and game updated.");
-            game.result = game.newResult;
+            //game.result = resultValue.value;
             game.lichessGameId = ""; // limpiamos input
         } else {
             alert(data.message || "Failed to fetch Lichess result.");
@@ -242,6 +265,11 @@ async function submitLichessResult(game) {
         console.error(err);
         alert("An error occurred while submitting the Lichess game ID.");
     }
+
+    fetchParings()
+    fetchStandings()
+    //onMounted(); // Refetch the tournament data
+    router.push('/tournamentdetail/' + tournamentId);    // Redirigimos para actualizar la vista
 }
 
 
@@ -263,6 +291,16 @@ async function submitOTBResult(game) {
         return;
     }
 
+    const resultValue = ref('')
+
+    if (game.newResult === "White wins (1-0)") {
+        resultValue.value = "w"
+    } else if (game.newResult === "Black wins (0-1)") {
+        resultValue.value = "b"
+    } else if (game.newResult === "Draw (1/2-1/2)") {
+        resultValue.value = "d"
+    }
+
     // Validamos el email
     const emailBuscado = email.toLowerCase();
     const existe = players.some(p => p.email === emailBuscado);
@@ -272,8 +310,10 @@ async function submitOTBResult(game) {
     }
     console.log("Game ID:", game.id);
     console.log("New Result:", game.newResult);
+    console.log("Result VALEU:", resultValue.value);
     console.log("Email:", email);
     console.log("Game:", game);
+
     try {
         const response = await fetch(API_URL + "update_otb_game/", {
             method: "POST",
@@ -282,7 +322,7 @@ async function submitOTBResult(game) {
             },
             body: JSON.stringify({
                 game_id: game.id,
-                otb_result: game.newResult,
+                otb_result: resultValue.value,
                 email: email,
             }),
         });
@@ -292,7 +332,7 @@ async function submitOTBResult(game) {
 
         if (response.ok) {
             alert("Game updated successfully!");
-            game.result = game.newResult;
+            game.result = resultValue.value;
             game.newResult = ""; // Reset select
         } else {
             alert(data.error || "Failed to update result. Something went wrong.");
@@ -301,14 +341,28 @@ async function submitOTBResult(game) {
         console.error(err);
         alert("An error occurred while submitting the result.");
     }
+
+    fetchStandings()
+    router.push('/tournamentdetail/' + tournamentId);    // Redirigimos para actualizar la vista
 }
 
 
 
 async function submitResultAdmin(game) {
+    const tournamentId = route.params.id; // Obtenemos el ID del torneo desde la URL
+
+    const resultValue = ref('')
+
+    if (game.newResult === "White wins (1-0)") {
+        resultValue.value = "w"
+    } else if (game.newResult === "Black wins (0-1)") {
+        resultValue.value = "b"
+    } else if (game.newResult === "Draw (1/2-1/2)") {
+        resultValue.value = "d"
+    }
 
     console.log("Game ID:", game.id);
-    console.log("New Result:", game.newResult);
+    console.log("New Result:", resultValue.value);
     console.log("Game:", game);
     console.log("Auth token:", authStore.token);
 
@@ -321,7 +375,7 @@ async function submitResultAdmin(game) {
             },
             body: JSON.stringify({
                 game_id: game.id,
-                otb_result: game.newResult,
+                otb_result: resultValue.value,
             }),
         });
         console.log("Response:", response);
@@ -330,7 +384,7 @@ async function submitResultAdmin(game) {
 
         if (response.ok) {
             alert("Game updated successfully!");
-            game.result = game.newResult;
+            game.result = resultValue.value;
             game.newResult = ""; // Reset select
         } else {
             alert(data.error || "Failed to update result. Something went wrong.");
@@ -339,6 +393,38 @@ async function submitResultAdmin(game) {
         console.error(err);
         alert("An error occurred while submitting the result.");
     }
+
+    //fetchParings()
+    fetchStandings()
+    router.push('/tournamentdetail/' + tournamentId);    // Redirigimos para actualizar la vista
+}
+
+async function fetchStandings() {
+    const tournamentId = route.params.id; // Obtenemos el ID del torneo desde la URL
+    // Obtenemos el ranking del torneo
+    const standingsresponse = await fetch(API_URL + "get_ranking/" + tournamentId);
+    const standingsRaw = await standingsresponse.json();
+
+    // Convertimos el objeto en array
+    const standingsArray = Object.values(standingsRaw);
+
+    // Ordenamos el array por `rank`
+    standingsData.value = standingsArray.sort((a, b) => a.rank - b.rank);
+}
+
+
+async function fetchParings() {
+    const tournamentId = route.params.id; // Obtenemos el ID del torneo desde la URL
+    try {
+        const roundsresponse = await fetch(API_URL + "get_round_results/" + tournamentId);
+        rounds.value = await roundsresponse.json();
+        //console.log("ROUNDSDATA:", roundsresponse.value);
+        console.log("ROUNDS FECHING:", rounds.value);
+    } catch (error) {
+        console.error('Error fetching tournament:', error);
+    }
+
+
 }
 
 

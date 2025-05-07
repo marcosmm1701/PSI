@@ -131,10 +131,10 @@ class Tournament(models.Model):
             value=ranking_value,
             defaults={'value': ranking_value}
         )
+        
         if not created:
             print("Error: El objeto ya existe en la lista de ranking.")
-            return
-
+        
         self.rankingList.add(ranking_obj)
 
         return
