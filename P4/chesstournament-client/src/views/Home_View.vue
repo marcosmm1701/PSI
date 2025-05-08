@@ -1,6 +1,11 @@
 <template>
-  <div class="Welcome-message-User" v-if="!authStore.isAuthenticated">
-    <h2 class="welcome-title">Welcome to the Chess Tournament Database</h2>
+  <div
+    v-if="!authStore.isAuthenticated"
+    class="Welcome-message-User"
+  >
+    <h2 class="welcome-title">
+      Welcome to the Chess Tournament Database
+    </h2>
     <p class="welcome-text">
       Welcome to the Chess Tournament Database.
       This database features the unique ability for players to update the results of their games.
@@ -8,11 +13,17 @@
     </p>
     <p class="welcome-text">
       You can use the search button to fund tournaments by name. For further information, please refer to the
-      <router-link :to="`/FAQ/`">FAQ</router-link> section.
+      <router-link :to="`/FAQ/`">
+        FAQ
+      </router-link> section.
     </p>
   </div>
 
-  <div class="Welcome-message-Admin" data-cy="admin-log" v-if="authStore.isAuthenticated">
+  <div
+    v-if="authStore.isAuthenticated"
+    class="Welcome-message-Admin"
+    data-cy="admin-log"
+  >
     <p>
       Hello, you are logged in as an administrator. Remember, with great prowe comes great responsibility.
     </p>
@@ -24,13 +35,17 @@
       tournaments, select the desired tournament.
     </p>
     <router-link to="/createTournament">
-      <button class="create-tournament-button" data-cy=create-Tournament-button>Create Tournament</button>
+      <button
+        class="create-tournament-button"
+        data-cy="create-Tournament-button"
+      >
+        Create Tournament
+      </button>
     </router-link>
   </div>
 
   <!--Seccion de Torneos-->
   <div class="tournament-section">
-
     <!-- Lista principal paginada -->
     <div class="listado-torneos">
       <h3>Tournaments</h3>
@@ -42,9 +57,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="t in tournaments" :key="t.id" >
+          <tr
+            v-for="t in tournaments"
+            :key="t.id"
+          >
             <td>
-              <router-link :to="`/tournamentdetail/${t.id}`" :data-cy="`${t.name}`">{{ t.name }}</router-link>
+              <router-link
+                :to="`/tournamentdetail/${t.id}`"
+                :data-cy="`${t.name}`"
+              >
+                {{ t.name }}
+              </router-link>
             </td>
             <td>{{ formatDate(t.start_date) }}</td>
             <!-- Hemos hecho la funcion formatDate para que no de muestre la hora -->
@@ -52,16 +75,37 @@
         </tbody>
       </table>
       <div class="pagination">
-        <button @click="prevPage" :disabled="currentPage === 1" data-cy="previous-button">Previous</button>
+        <button
+          :disabled="currentPage === 1"
+          data-cy="previous-button"
+          @click="prevPage"
+        >
+          Previous
+        </button>
         <!--<span>Page {{ currentPage }} of {{ totalPages }}</span>-->
-        <button @click="nextPage" :disabled="currentPage === totalPages" data-cy="next-button">Next</button>
+        <button
+          :disabled="currentPage === totalPages"
+          data-cy="next-button"
+          @click="nextPage"
+        >
+          Next
+        </button>
       </div>
     </div>
 
     <!-- Búsqueda -->
     <div class="search-box">
-      <input v-model="searchQuery" data-cy="input-search" placeholder="Search..." />
-      <button @click="search" data-cy=submit-search>Search</button>
+      <input
+        v-model="searchQuery"
+        data-cy="input-search"
+        placeholder="Search..."
+      >
+      <button
+        data-cy="submit-search"
+        @click="search"
+      >
+        Search
+      </button>
       <table v-if="filteredTournaments.length">
         <thead>
           <tr>
@@ -70,15 +114,22 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="t in filteredTournaments" :key="t.id" :data-cy="`search-${t.name}`">
-            <td><router-link :to="`/tournamentdetail/${t.id}`">{{ t.name }}</router-link></td>
+          <tr
+            v-for="t in filteredTournaments"
+            :key="t.id"
+            :data-cy="`search-${t.name}`"
+          >
+            <td>
+              <router-link :to="`/tournamentdetail/${t.id}`">
+                {{ t.name }}
+              </router-link>
+            </td>
             <td>{{ formatDate(t.start_date) }}</td>
             <!-- Hemos hecho la funcion formatDate para que no de muestre la hora -->
           </tr>
         </tbody>
       </table>
     </div>
-
   </div>
 </template>
 

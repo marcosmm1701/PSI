@@ -3,12 +3,28 @@
   <div class="app-container">
     <!-- Barra de navegación (común a todas las páginas) -->
     <nav class="navbar">
-      <div class="navbar-brand">Chess-T-DB</div>
+      <div class="navbar-brand">
+        Chess-T-DB
+      </div>
       <div class="navbar-links">
-        <router-link to="/">Home</router-link>
-        <router-link to="/login"  data-cy=login-cypress-test>Admin Log-In</router-link>
-        <router-link to="/logout" data-cy="logout-cypress-test">Log-Out</router-link>
-        <router-link to="/faq">FAQ</router-link>
+        <router-link to="/">
+          Home
+        </router-link>
+        <router-link
+          to="/login"
+          data-cy="login-cypress-test"
+        >
+          Admin Log-In
+        </router-link>
+        <router-link
+          to="/logout"
+          data-cy="logout-cypress-test"
+        >
+          Log-Out
+        </router-link>
+        <router-link to="/faq">
+          FAQ
+        </router-link>
       </div>
     </nav>
 

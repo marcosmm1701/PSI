@@ -1,13 +1,28 @@
 <template>
   <div class="faq-container">
-    <h1 class="faq-title">Frequently Asked Questions</h1>
+    <h1 class="faq-title">
+      Frequently Asked Questions
+    </h1>
     <div class="faq-list">
-      <div v-for="(faq, index) in faqs" :key="index" class="faq-item">
-        <div class="faq-question" @click="toggle(index)">
+      <div
+        v-for="(faq, index) in faqs"
+        :key="index"
+        class="faq-item"
+      >
+        <div
+          class="faq-question"
+          @click="toggle(index)"
+        >
           <span>{{ faq.question }}</span>
-          <span class="arrow" :class="{ open: openIndex === index }">&#9662;</span>
+          <span
+            class="arrow"
+            :class="{ open: openIndex === index }"
+          >&#9662;</span>
         </div>
-        <div class="faq-answer" v-if="openIndex === index">
+        <div
+          v-if="openIndex === index"
+          class="faq-answer"
+        >
           <p>{{ faq.answer }}</p>
         </div>
       </div>

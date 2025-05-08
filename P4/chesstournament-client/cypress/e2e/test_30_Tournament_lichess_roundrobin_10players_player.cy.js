@@ -135,7 +135,7 @@ describe("Round Robing 10 players tournament Lichess", () => {
         tournament_name,
         headerLIC + playersLIC
       ); //add tournament name, different for each test.
-      cy.wait(10000)
+      cy.wait(12000)
       // Go to main page and...
       cy.visit("/");
       //cy.wait(2000)

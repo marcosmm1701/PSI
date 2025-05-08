@@ -1,126 +1,194 @@
 <template>
-    <div class="tournament-detail">
-        <h2 data-cy="tournament-title">Tournament: <em>{{ tournamentName }}</em></h2>
-        <button @click="refreshPage" class="refresh-btn">Refresh Page</button>
-        <p>Click the accordions below to expand/collapse the content.</p>
+  <div class="tournament-detail">
+    <h2 data-cy="tournament-title">
+      Tournament: <em>{{ tournamentName }}</em>
+    </h2>
+    <button
+      class="refresh-btn"
+      @click="refreshPage"
+    >
+      Refresh Page
+    </button>
+    <p>Click the accordions below to expand/collapse the content.</p>
 
-        <!-- Acordeones -->
-        <details>
+    <!-- Acordeones -->
+    <details>
+      <!-- Contenido claseificación-->
+      <summary data-cy="standing-accordion-button">
+        Standing
+      </summary>
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Username</th>
+            <th>Points</th>
+            <th>Nº Wins</th>
+            <th>Nº Black times</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(player, index) in standingsData"
+            :key="index"
+            :data-cy="'ranking-' + (Number(index) + 1)"
+          >
+            <td>{{ player.rank }}</td>
+            <td>{{ player.name }}</td>
+            <td>{{ player.score }}</td>
+            <td>{{ Number(player.WI).toFixed(2) }}</td>
+            <td>{{ Number(player.BT).toFixed(2) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </details>
 
-            <!-- Contenido claseificación-->
-            <summary data-cy="standing-accordion-button">Standing</summary>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Username</th>
-                        <th>Points</th>
-                        <th>Nº Wins</th>
-                        <th>Nº Black times</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(player, index) in standingsData" :key="index"
-                        :data-cy="'ranking-' + (Number(index) + 1)">
-                        <td>{{ player.rank }}</td>
-                        <td>{{ player.name }}</td>
-                        <td>{{ player.score }}</td>
-                        <td>{{ Number(player.WI).toFixed(2) }}</td>
-                        <td>{{ Number(player.BT).toFixed(2) }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </details>
+    <details>
+      <summary>Pairings/Results</summary>
+      <div
+        v-if="tournament?.board_type === 'OTB'"
+        class="otb-banner"
+      >
+        <strong>OTB</strong>
+      </div>
+      <div
+        v-if="tournament?.board_type === 'LIC'"
+        class="lic-banner"
+      >
+        <strong>LICHESS</strong>
+      </div>
 
-        <details>
-            <summary>Pairings/Results</summary>
-            <div v-if="tournament?.board_type === 'OTB'" class="otb-banner">
-                <strong>OTB</strong>
-            </div>
-            <div v-if="tournament?.board_type === 'LIC'" class="lic-banner">
-                <strong>LICHESS</strong>
-            </div>
+      <div class="explanation">
+        <p>
+          The abbreviations used in the "result" column are explained at the end of the page.
+          Press 📤 to update the game result. See the <router-link to="/faq">
+            FAQ
+          </router-link> for more
+          information.
+        </p>
+      </div>
+      <div
+        v-for="(round, roundIndex) in rounds"
+        :key="roundIndex"
+      >
+        <h3 :data-cy="'round_' + (Number(roundIndex) + 1)">
+          {{ round.round_name }}
+        </h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Table</th>
+              <th>White</th>
+              <th>Result</th>
+              <th>Black</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(game, i) in round.games"
+              :key="i"
+              :data-cy="'game_' + (Number(roundIndex) + 1) + '_' + (Number(i))"
+            >
+              <td>
+                {{ i }} <br>
+                GAME: {{ 'game_' + (Number(roundIndex) + 1) + '_' + (Number(i)) }} <br>
+                VALORES: {{ 'select-' + (Number(roundIndex) + 1) + '-' + (Number(i)) }}
+              </td>
 
-            <div class="explanation">
-                <p>
-                    The abbreviations used in the "result" column are explained at the end of the page.
-                    Press 📤 to update the game result. See the <router-link to="/faq">FAQ</router-link> for more
-                    information.
-                </p>
-            </div>
-            <div v-for="(round, roundIndex) in rounds" :key="roundIndex">
-                <h3 :data-cy="'round_' + (Number(roundIndex) + 1)">{{ round.round_name }}</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Table</th>
-                            <th>White</th>
-                            <th>Result</th>
-                            <th>Black</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(game, i) in round.games" :key="i"
-                            :data-cy="'game_' + (Number(roundIndex) + 1) + '_' + (Number(i))">
-                            <td>
-                                {{ i }} <br />
-                                GAME: {{ 'game_' + (Number(roundIndex) + 1) + '_' + (Number(i)) }} <br />
-                                VALORES: {{ 'select-' + (Number(roundIndex) + 1) + '-' + (Number(i)) }}
-                            </td>
-
-                            <td>{{ game.white_name }}</td>
-                            <td class="result-cell">
-
-                                <span v-if="game.result != '*'"
-                                    :data-cy="'input-' + (Number(roundIndex) + 1) + '-' + i">
-                                    {{ getReadableResult(game.result) }}
-                                </span>
+              <td>{{ game.white_name }}</td>
+              <td class="result-cell">
+                <span
+                  v-if="game.result != '*'"
+                  :data-cy="'input-' + (Number(roundIndex) + 1) + '-' + i"
+                >
+                  {{ getReadableResult(game.result) }}
+                </span>
 
 
-                                <div v-if="game.result === '*'">
-                                    <template v-if="tournament.board_type === 'LIC'">
-                                        <input v-model="game.lichessGameId" placeholder="Lichess game ID"
-                                            :data-cy="'input-' + (Number(roundIndex) + 1) + '-' + i" />
-                                        <button @click="submitLichessResult(game)"
-                                            :data-cy="'button-' + (Number(roundIndex) + 1) + '-' + i">📤</button>
-                                    </template>
-                                    <template v-if="tournament.board_type === 'OTB'">
-                                        <label><strong>Result:</strong></label>
-                                        <select v-model="game.newResult"
-                                            :data-cy="'select-' + (Number(roundIndex) + 1) + '-' + i">
-                                            <option disabled value="">Select result</option>
-                                            <option value="White wins (1-0)">White wins (1-0)</option>
-                                            <option value="Black wins (0-1)">Black wins (0-1)</option>
-                                            <option value="Draw (1/2-1/2)">Draw (1/2-1/2)</option>
-                                        </select>
-                                        <button @click="submitOTBResult(game)"
-                                            :data-cy="'button-' + (Number(roundIndex) + 1) + '-' + i">📤</button>
-                                    </template>
-                                </div>
+                <div v-if="game.result === '*'">
+                  <template v-if="tournament.board_type === 'LIC'">
+                    <input
+                      v-model="game.lichessGameId"
+                      placeholder="Lichess game ID"
+                      :data-cy="'input-' + (Number(roundIndex) + 1) + '-' + i"
+                    >
+                    <button
+                      :data-cy="'button-' + (Number(roundIndex) + 1) + '-' + i"
+                      @click="submitLichessResult(game)"
+                    >
+                      📤
+                    </button>
+                  </template>
+                  <template v-if="tournament.board_type === 'OTB'">
+                    <label><strong>Result:</strong></label>
+                    <select
+                      v-model="game.newResult"
+                      :data-cy="'select-' + (Number(roundIndex) + 1) + '-' + i"
+                    >
+                      <option
+                        disabled
+                        value=""
+                      >
+                        Select result
+                      </option>
+                      <option value="White wins (1-0)">
+                        White wins (1-0)
+                      </option>
+                      <option value="Black wins (0-1)">
+                        Black wins (0-1)
+                      </option>
+                      <option value="Draw (1/2-1/2)">
+                        Draw (1/2-1/2)
+                      </option>
+                    </select>
+                    <button
+                      :data-cy="'button-' + (Number(roundIndex) + 1) + '-' + i"
+                      @click="submitOTBResult(game)"
+                    >
+                      📤
+                    </button>
+                  </template>
+                </div>
 
-                                <div v-if="authStore.isAuthenticated">
-                                    <!-- Resultado ya asignado, pero eres admin -->
-                                    <label><strong>Result (Admin):</strong></label>
-                                    <select v-model="game.newResult"
-                                        :data-cy="'select-admin-' + (Number(roundIndex) + 1) + '-' + i">
-                                        <option disabled value="">Select result</option>
-                                        <option value="White wins (1-0)">White wins (1-0)</option>
-                                        <option value="Black wins (0-1)">Black wins (0-1)</option>
-                                        <option value="Draw (1/2-1/2)">Draw (1/2-1/2)</option>
-                                    </select>
-                                    <button @click="submitResultAdmin(game)"
-                                        :data-cy="'button-admin-' + (Number(roundIndex) + 1) + '-' + i">📤</button>
-                                </div>
-                            </td>
+                <div v-if="authStore.isAuthenticated">
+                  <!-- Resultado ya asignado, pero eres admin -->
+                  <label><strong>Result (Admin):</strong></label>
+                  <select
+                    v-model="game.newResult"
+                    :data-cy="'select-admin-' + (Number(roundIndex) + 1) + '-' + i"
+                  >
+                    <option
+                      disabled
+                      value=""
+                    >
+                      Select result
+                    </option>
+                    <option value="White wins (1-0)">
+                      White wins (1-0)
+                    </option>
+                    <option value="Black wins (0-1)">
+                      Black wins (0-1)
+                    </option>
+                    <option value="Draw (1/2-1/2)">
+                      Draw (1/2-1/2)
+                    </option>
+                  </select>
+                  <button
+                    :data-cy="'button-admin-' + (Number(roundIndex) + 1) + '-' + i"
+                    @click="submitResultAdmin(game)"
+                  >
+                    📤
+                  </button>
+                </div>
+              </td>
 
-                            <td>{{ game.black_name }}</td>
-                        </tr>
-                    </tbody>
-
-                </table>
-            </div>
-        </details>
-    </div>
+              <td>{{ game.black_name }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </div>
 </template>
 
 <script setup>

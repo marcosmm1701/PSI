@@ -406,7 +406,7 @@ class TournamentCreateAPIViewTest(TransactionTestCase):
     @tag("continua")
     def test_create_tournament_with_invalid_csv(self):
         """Test when invalid CSV data is provided for players"""
-        invalid_csv_data = '''HOLaa,email
+        invalid_csv_data = '''lichess_username,email
         "Player One",player1@example.com
         "Player Two",player2@example.com
         '''
@@ -414,7 +414,7 @@ class TournamentCreateAPIViewTest(TransactionTestCase):
         data = {
             "name": "Test Tournament with Invalid CSV",
             "tournament_type": TournamentType.ROUNDROBIN,
-            "board_type": TournamentBoardType.OTB,
+            "board_type": TournamentBoardType.LICHESS,
             "win_points": 1.0,
             "draw_points": 0.5,
             "lose_points": 0.0,
@@ -428,7 +428,7 @@ class TournamentCreateAPIViewTest(TransactionTestCase):
         self.assertEqual(response.status_code,
                          status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['result'], False)
-        self.assertIn("Error creating tournament",
+        self.assertIn("Error: can not add players to tournament",
                       response.data['message'])
 
     @tag("continua")

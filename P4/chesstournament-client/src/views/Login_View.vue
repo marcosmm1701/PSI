@@ -1,38 +1,52 @@
 <template>
-    <!-- Contenedor principal que agrupa todos los elementos del componente -->
-    <div class="login-container">
-        <h2 class="login-tittle">Login</h2>
+  <!-- Contenedor principal que agrupa todos los elementos del componente -->
+  <div class="login-container">
+    <h2 class="login-tittle">
+      Login
+    </h2>
 
-        <!-- Formulario para hacer login. -->
-        <form @submit.prevent="handleLogin">    <!-- Cuando escucha el evento submit, se llama a la función handleLogin -->
-            <div class="input-group">
-                <input
-                    id="username"
-                    v-model="username"
-                    type="text"
-                    placeholder="Username"
-                    data-cy="username"
-                    class="login-input"
-                />
-            </div>
+    <!-- Formulario para hacer login. -->
+    <form @submit.prevent="handleLogin">
+      <!-- Cuando escucha el evento submit, se llama a la función handleLogin -->
+      <div class="input-group">
+        <input
+          id="username"
+          v-model="username"
+          type="text"
+          placeholder="Username"
+          data-cy="username"
+          class="login-input"
+        >
+      </div>
 
-            <div class="input-group">
-                <input
-                    id="password"
-                    v-model="password"
-                    type="password"
-                    placeholder="Password"
-                    data-cy="password"
-                    class="login-input"
-                />
-            </div>
+      <div class="input-group">
+        <input
+          id="password"
+          v-model="password"
+          type="password"
+          placeholder="Password"
+          data-cy="password"
+          class="login-input"
+        >
+      </div>
             
-            <button type="submit" class="login-button" data-cy="login-button">Log in</button>
-        </form>
-        <!-- Cuando la variable errorMessage esté a true, se muestra el mensaje de {{ errorMesage }}-->
-        <p v-if="errorMessage" class="error-message" data-cy="error-message">{{ errorMessage }}</p>
-    </div>
-
+      <button
+        type="submit"
+        class="login-button"
+        data-cy="login-button"
+      >
+        Log in
+      </button>
+    </form>
+    <!-- Cuando la variable errorMessage esté a true, se muestra el mensaje de {{ errorMesage }}-->
+    <p
+      v-if="errorMessage"
+      class="error-message"
+      data-cy="error-message"
+    >
+      {{ errorMessage }}
+    </p>
+  </div>
 </template>
 
 <script setup>
