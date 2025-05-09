@@ -72,12 +72,7 @@
               :data-cy="'game_' + (Number(roundIndex) + 1) + '_' + Number(i)"
             >
               <td>
-                {{ i }} <br />
-                GAME:
-                {{ "game_" + (Number(roundIndex) + 1) + "_" + Number(i) }}
-                <br />
-                VALORES:
-                {{ "select-" + (Number(roundIndex) + 1) + "-" + Number(i) }}
+                {{ i }}
               </td>
 
               <td>{{ game.white_name }}</td>
@@ -125,7 +120,7 @@
 
                 <div v-if="authStore.isAuthenticated">
                   <!-- Resultado ya asignado, pero eres admin -->
-                  <label><strong>Result (Admin):</strong></label>
+                  <label><strong>Result (Admin): </strong></label>
                   <select
                     v-model="game.newResult"
                     :data-cy="
@@ -443,6 +438,16 @@ function refreshPage() {
 <style scoped>
 .tournament-detail {
   padding: 2rem;
+  background-color: rgba(0, 0, 0, 0.6); /* semi-transparente para contraste sobre imagen */
+  color: #ffffff; /* texto blanco para buen contraste */
+  border-radius: 10px;
+  backdrop-filter: blur(5px); /* efecto moderno con desenfoque */
+}
+
+h2,
+h3,
+details summary {
+  color: #ffffff;
 }
 
 .refresh-btn {
@@ -452,19 +457,44 @@ function refreshPage() {
   padding: 0.5rem 1rem;
   border-radius: 6px;
   cursor: pointer;
+  color: #004080;
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin-bottom: 2rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.8); /* fondo semitransparente para mejor contraste */
 }
 
-th,
-td {
-  border: 1px solid #ccc;
-  padding: 0.5rem;
+
+th {
+  background-color: #004080;
+  color: rgb(12, 12, 12);
+  padding: 0.75rem;
+  font-weight: bold;
   text-align: left;
+}
+
+td, tr {
+  background-color: rgba(10, 10, 10, 0.95);
+  padding: 0.75rem;
+  border-bottom: 1px solid #ddd;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+input, select {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #0d0c0c;
+  background-color: #f9f9f9;
 }
 
 .result-cell {
@@ -472,15 +502,26 @@ td {
   gap: 0.5rem;
 }
 
-input {
-  padding: 0.3rem;
+button {
+  background-color: #66a3ff;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
 }
 
-button {
-  background-color: transparent;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
+.otb-banner,
+.lic-banner {
+  background-color: #ffeeba;
+  color: #856404;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ffd966;
+  text-align: center;
+  font-weight: bold;
 }
 
 details summary {
@@ -489,20 +530,9 @@ details summary {
   cursor: pointer;
 }
 
-.otb-banner,
-.lic-banner {
-  background-color: #fff3cd;
-  color: #856404;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid #ffeeba;
-  text-align: center;
-}
 
 .explanation {
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  color: #333;
+  padding: 0.5rem;
+  text-align: left;
 }
 </style>

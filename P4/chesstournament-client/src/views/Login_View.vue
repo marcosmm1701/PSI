@@ -113,11 +113,10 @@ const handleLogin = async () => {
 
 .login-container {
   position: absolute;
-  top: 50%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 450px;
-  margin: auto;
   padding: 40px 40px;
   background: white;
   border-radius: 20px; /* Bordes muy redondeados y bonitos ;)*/

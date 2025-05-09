@@ -10,16 +10,10 @@
         <router-link to="/">
           Home
         </router-link>
-        <router-link
-          to="/login"
-          data-cy="login-cypress-test"
-        >
+        <router-link to="/login" data-cy="login-cypress-test">
           Admin Log-In
         </router-link>
-        <router-link
-          to="/logout"
-          data-cy="logout-cypress-test"
-        >
+        <router-link to="/logout" data-cy="logout-cypress-test">
           Log-Out
         </router-link>
         <router-link to="/faq">
@@ -27,12 +21,10 @@
         </router-link>
       </div>
     </nav>
-
     <!-- Contenedor principal donde se cargarán las vistas -->
     <main class="main-content">
       <router-view /> <!-- Aquí se inyectarán los componentes de cada ruta -->
     </main>
-
     <!-- Footer común a todas las páginas -->
     <footer class="footer">
       © 2024 Copyright: I. Serena y M. Muñoz
@@ -49,11 +41,30 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <style scoped>
 /* scoped: Estilos específicos para este componente */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  /* ¡Importante! */
+}
+
+.app-root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 
 .app-container {
   width: 100%;
   display: flex;
   flex-direction: column;
+  /*Nos aseguramos que no sea tapado por la navbar*/
+
   min-height: 100vh;
   /* asegura que el contenedor tenga al menos la altura de la pantalla */
   min-width: 120vh;
