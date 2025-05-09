@@ -10,7 +10,7 @@
     "test:e2e:dev": "start-server-and-test 'vite dev --port 4173' :4173 'cypress open --e2e'",
     "test:unit": "cypress run --component",
     "test:unit:dev": "cypress open --component",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+    "lint": "eslint src --ext .vue,.js,.jsx,.cjs,.mjs --fix"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",

@@ -5,7 +5,7 @@ import App from "./App.vue";
 import router from "./router";
 
 // Importamos el CSS de Bootstrap
-import './assets/main.css'
+import "./assets/main.css";
 
 const app = createApp(App);
 
@@ -18,4 +18,4 @@ app.mount("#app");
 import "../node_modules/bootstrap/dist/js/bootstrap.js";
 
 // Importa el archivo CSS de Bootstrap desde node_modules
-import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css";

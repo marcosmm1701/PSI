@@ -1,21 +1,16 @@
 <template>
-  <div
-    v-if="!authStore.isAuthenticated"
-    class="Welcome-message-User"
-  >
-    <h2 class="welcome-title">
-      Welcome to the Chess Tournament Database
-    </h2>
+  <div v-if="!authStore.isAuthenticated" class="Welcome-message-User">
+    <h2 class="welcome-title">Welcome to the Chess Tournament Database</h2>
     <p class="welcome-text">
-      Welcome to the Chess Tournament Database.
-      This database features the unique ability for players to update the results of their games.
-      To create tournaments, an administrative account is required. However, any player can enter the result of a game.
+      Welcome to the Chess Tournament Database. This database features the
+      unique ability for players to update the results of their games. To create
+      tournaments, an administrative account is required. However, any player
+      can enter the result of a game.
     </p>
     <p class="welcome-text">
-      You can use the search button to fund tournaments by name. For further information, please refer to the
-      <router-link :to="`/FAQ/`">
-        FAQ
-      </router-link> section.
+      You can use the search button to fund tournaments by name. For further
+      information, please refer to the
+      <router-link :to="`/FAQ/`"> FAQ </router-link> section.
     </p>
   </div>
 
@@ -25,14 +20,17 @@
     data-cy="admin-log"
   >
     <p>
-      Hello, you are logged in as an administrator. Remember, with great prowe comes great responsibility.
+      Hello, you are logged in as an administrator. Remember, with great prowe
+      comes great responsibility.
     </p>
     <p>
-      As an administratos you can create tournaments and edit or update the results of games, rounds, and tournaments.
+      As an administratos you can create tournaments and edit or update the
+      results of games, rounds, and tournaments.
     </p>
     <p>
-      To create a new tournament, press the <strong>Create Tournament</strong> button. To edit or update games, rounds, or
-      tournaments, select the desired tournament.
+      To create a new tournament, press the
+      <strong>Create Tournament</strong> button. To edit or update games,
+      rounds, or tournaments, select the desired tournament.
     </p>
     <router-link to="/createTournament">
       <button
@@ -57,10 +55,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="t in tournaments"
-            :key="t.id"
-          >
+          <tr v-for="t in tournaments" :key="t.id">
             <td>
               <router-link
                 :to="`/tournamentdetail/${t.id}`"
@@ -99,13 +94,8 @@
         v-model="searchQuery"
         data-cy="input-search"
         placeholder="Search..."
-      >
-      <button
-        data-cy="submit-search"
-        @click="search"
-      >
-        Search
-      </button>
+      />
+      <button data-cy="submit-search" @click="search">Search</button>
       <table v-if="filteredTournaments.length">
         <thead>
           <tr>
@@ -133,13 +123,9 @@
   </div>
 </template>
 
-
-
-
-
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useAuthStore } from '@/stores/auth'
+import { ref, onMounted } from "vue";
+import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore(); // Instancia del store de autenticación
 
@@ -147,16 +133,15 @@ const tournaments = ref([]);
 const currentPage = ref(1);
 const totalPages = ref(1);
 
-const searchQuery = ref('');
+const searchQuery = ref("");
 const filteredTournaments = ref([]);
 
 // Función para formatear la fecha
 const formatDate = (datetimeString) => {
-  return datetimeString.split('T')[0];
-}
+  return datetimeString.split("T")[0];
+};
 
 const API_URL = import.meta.env.VITE_DJANGOURL;
-
 
 async function fetchTournaments(page = 1) {
   try {
@@ -166,10 +151,9 @@ async function fetchTournaments(page = 1) {
     totalPages.value = Math.ceil(data.count / 10); // count viene del backend
     currentPage.value = page;
   } catch (error) {
-    console.error('Error fetching tournaments:', error);
+    console.error("Error fetching tournaments:", error);
   }
 }
-
 
 onMounted(() => {
   fetchTournaments();
@@ -187,30 +171,28 @@ function prevPage() {
   }
 }
 
-
 // Búsqueda
 async function search() {
   const query = searchQuery.value.toLowerCase();
 
   const response = await fetch(API_URL + "searchTournaments/", {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      search_string: query
+      search_string: query,
     }),
   });
 
   const data = await response.json();
   if (!response.ok) {
-    console.error('Error fetching tournaments:', data);
+    console.error("Error fetching tournaments:", data);
     return;
   }
   filteredTournaments.value = data || [];
 }
 </script>
-
 
 <style scoped>
 .home-container {
@@ -223,7 +205,7 @@ async function search() {
   padding: 2rem;
   border-radius: 1rem;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .welcome-title {
@@ -237,8 +219,6 @@ async function search() {
   line-height: 1.6;
   color: #333;
 }
-
-
 
 .tournament-section {
   padding: 1rem;
@@ -304,7 +284,6 @@ async function search() {
   background-color: #125ea5;
 }
 
-
 table {
   width: 100%;
   border-collapse: collapse;
@@ -355,7 +334,7 @@ button {
 
 .create-tournament-button {
   width: 100%;
-  background-color: #4CAF50; /* Verde vibrante */
+  background-color: #4caf50; /* Verde vibrante */
   color: white;
   border: none;
   padding: 12px 24px;

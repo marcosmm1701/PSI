@@ -1,69 +1,63 @@
 <template>
   <div class="faq-container">
-    <h1 class="faq-title">
-      Frequently Asked Questions
-    </h1>
+    <h1 class="faq-title">Frequently Asked Questions</h1>
     <div class="faq-list">
-      <div
-        v-for="(faq, index) in faqs"
-        :key="index"
-        class="faq-item"
-      >
-        <div
-          class="faq-question"
-          @click="toggle(index)"
-        >
+      <div v-for="(faq, index) in faqs" :key="index" class="faq-item">
+        <div class="faq-question" @click="toggle(index)">
+          <span class="icon">💬</span>
           <span>{{ faq.question }}</span>
-          <span
-            class="arrow"
-            :class="{ open: openIndex === index }"
-          >&#9662;</span>
+          <span class="arrow" :class="{ open: openIndex === index }">&#9662;</span>
         </div>
-        <div
-          v-if="openIndex === index"
-          class="faq-answer"
-        >
-          <p>{{ faq.answer }}</p>
-        </div>
+        <transition name="fade">
+          <div v-if="openIndex === index" class="faq-answer">
+            <p>{{ faq.answer }}</p>
+          </div>
+        </transition>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 
 const faqs = [
   {
-    question: '¿Qué es esta base de datos de torneos de ajedrez?',
-    answer: 'Es una plataforma donde jugadores pueden buscar, ver y actualizar resultados de partidas en torneos de ajedrez.'
+    question: "¿Qué es esta base de datos de torneos de ajedrez?",
+    answer:
+      "Es una plataforma donde jugadores pueden buscar, ver y actualizar resultados de partidas en torneos de ajedrez.",
   },
   {
-    question: '¿Necesito una cuenta para usar la plataforma?',
-    answer: 'Cualquiera puede buscar torneos y ver resultados, pero solo los usuarios autenticados pueden actualizar resultados. Solo los administradores pueden crear torneos.'
+    question: "¿Necesito una cuenta para usar la plataforma?",
+    answer:
+      "Cualquiera puede buscar torneos y ver resultados, pero solo los usuarios autenticados pueden actualizar resultados. Solo los administradores pueden crear torneos.",
   },
   {
-    question: '¿Cómo puedo crear un torneo?',
-    answer: 'Debes estar autenticado como administrador. Una vez dentro, verás el botón "Crear Torneo".'
+    question: "¿Cómo puedo crear un torneo?",
+    answer:
+      'Debes estar autenticado como administrador. Una vez dentro, verás el botón "Crear Torneo".',
   },
   {
-    question: '¿Puedo editar un torneo existente?',
-    answer: 'Solo los administradores pueden editar la información de un torneo. Los jugadores solo pueden ingresar resultados de sus partidas.'
+    question: "¿Puedo editar un torneo existente?",
+    answer:
+      "Solo los administradores pueden editar la información de un torneo. Los jugadores solo pueden ingresar resultados de sus partidas.",
   },
   {
-    question: '¿Dónde puedo reportar errores o sugerencias?',
-    answer: 'Puedes contactar al administrador del sitio a través del correo de soporte chesstable@chess.com'
+    question: "¿Dónde puedo reportar errores o sugerencias?",
+    answer:
+      "Puedes contactar al administrador del sitio a través del correo de soporte chesstable@chess.com",
   },
   {
-    question: '¿Cómo pueden los administradores añadir jugadores a un torneo?',
-    answer: 'Los jugadores se añaden mediante archivos en formato CSV. El archivo debe contener los nombres de las columnas en la primera fila, que deben coincidir con los campos del jugador (nombre, email, lichess_username, fide_rating_blitz, etc.). Para torneos en lichess, se requiere lichess_username. Para torneos presenciales (OTB), se requieren nombre y email. El sistema verificará automáticamente los nombres de usuario en lichess o usará los ratings FIDE para torneos presenciales.'
-  }
-]
+    question: "¿Cómo pueden los administradores añadir jugadores a un torneo?",
+    answer:
+      "Los jugadores se añaden mediante archivos en formato CSV. El archivo debe contener los nombres de las columnas en la primera fila, que deben coincidir con los campos del jugador (nombre, email, lichess_username, fide_rating_blitz, etc.). Para torneos en lichess, se requiere lichess_username. Para torneos presenciales (OTB), se requieren nombre y email. El sistema verificará automáticamente los nombres de usuario en lichess o usará los ratings FIDE para torneos presenciales.",
+  },
+];
 
-const openIndex = ref(null)
+const openIndex = ref(null);
 
 function toggle(index) {
-  openIndex.value = openIndex.value === index ? null : index
+  openIndex.value = openIndex.value === index ? null : index;
 }
 </script>
 
@@ -126,4 +120,44 @@ function toggle(index) {
   color: #374151;
   background-color: #fefefe;
 }
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.faq-item:nth-child(even) {
+  background-color: #ffffff;
+}
+.faq-item:nth-child(odd) {
+  background-color: #f1f8e9;
+}
+
+.faq-item {
+  border-left: 6px solid #42b983; /* verde Vue */
+}
+
+.faq-question {
+  background-color: #e3f2fd; /* azul claro */
+  color: #0d47a1; /* azul oscuro */
+}
+.faq-question:hover {
+  background-color: #bbdefb;
+}
+
+.faq-title {
+  color: #9c27b0; /* púrpura */
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+}
+
+.icon {
+  margin-right: 0.5rem;
+}
+
+
 </style>
