@@ -8,7 +8,7 @@
 
 - **Backend:** Django + Django REST Framework
 - **Frontend:** Vue 3 + Vite
-- **Base de datos:** SQLite (modo desarrollo)
+- **Base de datos:** PostgreSQL (modo desarrollo) / Neon4j (modo producción)
 - **Autenticación:** Token Auth (DRF)
 - **Tests automáticos:** Cypress
 - **Linting:** ESLint + Prettier
